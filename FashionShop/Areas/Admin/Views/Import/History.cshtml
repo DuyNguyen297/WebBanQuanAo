@@ -1,0 +1,226 @@
+﻿@using FashionShop.AreaModels
+@using FashionShop.Models
+@using FashionShop.Shared
+@using Newtonsoft.Json;
+@using PagedList.Mvc
+
+@model PagedList.IPagedList<FashionShop.Models.Import>
+@{
+    ViewData["Title"] = "Lịch sử nhập hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+@section Styles{
+    <link href="~/Content/css/bill.css" rel="stylesheet" />
+    <style type="text/css" media="print">
+        html, body {
+            margin: 0;
+            padding: 10px;
+        }
+
+        .modal {
+            display: none;
+        }
+    </style>
+}
+<div class="page-header">
+    <div class="header-sub-title">
+        <nav class="breadcrumb breadcrumb-dash">
+            <a href="@Url.Action("Index","Dashboard")" class="breadcrumb-item"><i class="fa-solid fa-house mr-1"></i>Trang chủ</a>
+            <span class="breadcrumb-item active">Lịch sử nhập hàng</span>
+        </nav>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="input-affix">
+                            <i class="prefix-icon anticon anticon-search opacity-04"></i>
+                            <input id="keyword" name="keyword" type="text" class="form-control" placeholder="Tìm kiếm đơn nhập hàng">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 text-right">
+                <button type="button" class="btn btn-warning" data-container="body" data-toggle="popover" data-placement="left" data-content="Chức năng đang phát triển.">
+                    <i class="fa-solid fa-check mr-1"></i>
+                    Xuất danh sách
+                </button>
+            </div>
+        </div>
+        <div class="table-responsive table-hover">
+            @if (Model.Count > 0)
+            {
+                <table id="table_click" class="table align-middle mb-0 bg-white">
+                    <thead class="thead-dark">
+                        <tr class="info">
+                            <th>#Thông tin</th>
+                            <th>Người nhập</th>
+                            <th>Ngày nhập</th>
+                            <th>Tổng tiền</th>
+                            <th class="text-center">Hóa đơn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            foreach (var item in Model)
+                            {
+                                <tr data-toggle="collapse" class="accordion-toggle" data-target="#@($"row_{item.Id}")">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="mx-3">
+                                                <p class="font-weight-bold mb-1">Số sản phẩm:<span class="font-weight-bold"> @(item.ImportDetails?.Count)</span></p>
+                                                <p class="mb-0"><span class="font-weight-semibold">#@item.Code</span></p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="font-weight-semibold">@(item.Account?.Name)</span>
+                                    </td>
+                                    <td>
+                                        <span class="font-weight-semibold">@(item.CreatedAt?.ToString("dd/MM/yyyy hh:mm tt"))</span>
+                                    </td>
+                                    <td class="font-weight-semibold text-nowrap">
+                                        @(item.Total?.ToString("n0")) VNĐ
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-icon btn-hover btn-sm btn-rounded anticon anticon-eye" id="@item.Id" onclick="GetBill(this)"  data-toggle="tooltip" data-placement="top" title="Xem hóa đơn"></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="12" class="hiddenRow p-0">
+                                        <div class="accordian-body collapse table-responsive pl-5" style="border-left: 5px black solid" id="@($"row_{item.Id}")">
+                                            <table class="table table-sm m-0" style="background-color: beige">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th>#Sản phẩm</th>
+                                                        <th>Giá</th>
+                                                        <th class="text-center">Màu</th>
+                                                        <th class="text-center">Size</th>
+                                                        <th class="text-center">Số lượng</th>
+                                                        <th>Tổng tiền</th>
+                                                        <th class="text-center"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @{
+                                                        foreach (var ite in item.ImportDetails)
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="d-flex align-items-center">
+                                                                        <img src="~/Assets/images/product/@(ite.Product?.Image)"
+                                                                             alt=""
+                                                                             style="width: 50px; height: 50px"
+                                                                             class="avatar avatar-image rounded" />
+                                                                        <div class="mx-3">
+                                                                            <p class="font-weight-bold mb-1">@(ite.Product?.Name)</p>
+                                                                            <p class="mb-0">#@(ite.Product?.Code)</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <p class="mb-1">Giá bán:<span class="text-nowrap font-weight-semibold"> @(ite.Product?.Price?.ToString("n0"))</span></p>
+                                                                    <p class="mb-0">Giá nhập:<span class="text-nowrap font-weight-semibold"> @(ite.PriceIn?.ToString("n0"))</span></p>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    @{
+                                                                        string color = (ViewBag.ColorId as List<Color>).FirstOrDefault(c => c.Id == ite.Product?.ColorId)?.Code;
+                                                                    }
+                                                                    <span class="badge text-dark" style="background-color:@(color)">@(color)</span>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    @{
+                                                                        string size = (ViewBag.SizeId as List<Size>).FirstOrDefault(c => c.Id == ite.Product?.SizeId)?.Code;
+                                                                    }
+                                                                    <span class="badge badge-dark font-weight-bold">@(size)</span>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <span class="badge badge-pill badge-dark font-weight-bold">@(ite.Quantity)</span>
+                                                                </td>
+                                                                <td class="text-nowrap">@(ite.Total?.ToString("n0")) VNĐ</td>
+                                                                <td class="text-center">
+                                                                    <a class="btn btn-icon btn-hover btn-sm btn-rounded anticon anticon-info-circle" href="@Url.Action("Details", "Product", new {id=ite.ProductId})"  data-toggle="tooltip" data-placement="top" title="Chi tiết sản phẩm"></a>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+                <div aria-label="Page navigation example" class="my-3">
+                    @Html.PagedListPager(
+                        Model,
+                        page => Url.Action("History", new { page })
+                    )
+                </div>
+            }
+            else
+            {
+                <div class="text-muted font-italic">
+                    Không có đơn nhập hàng nào
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<!-- Modal bill-->
+<div class="modal fade" id="billModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:10000 !important">
+    <div class="modal-dialog modal-lg" id="bill-modal" role="document">
+        <!-- Partial bill-->
+    </div>
+</div>
+@section scripts{
+    <script>
+         function printBill() {
+             var restorepage = $('body').html();
+             var printcontent = $('#bill-print').clone();
+             $('body').empty().html(printcontent);
+             window.print();
+             $('body').html(restorepage);
+             window.location.reload();
+        };
+        function GetBill(button) {
+            var id = button.id;
+             $.ajax({
+                 url: "@Url.Action("GetBillById")",
+                 data: {
+                     id:id
+                 },
+                  type: "POST",
+                  success: function (results) {
+                      if (results.error) {
+                          displayMessage(result.message, '', 'error');
+                      } else {
+                          $("#bill-modal").html("");
+                          $("#bill-modal").html(results);
+                          $("#billModal").modal();
+                      }
+                  },
+                  error: function (results) {
+                      alert(results.responseText);
+                  }
+              });
+        }
+         $(document).ready(function () {
+             
+         });
+        document.getElementById('table_click').addEventListener('click', function (event) {
+            var target = event.target;
+            // Kiểm tra xem phần tử được click có phải là thẻ 'a' không
+            if (target.tagName.toLowerCase() === 'a' || target.tagName.toLowerCase() === 'button') {
+                // Ngăn chặn sự kiện click từ thẻ 'a' truyền lên đến thẻ 'tr'
+                event.stopPropagation();
+            } else if (target.tagName.toLowerCase() === 'td') {
+            }
+        });
+    </script>
+}

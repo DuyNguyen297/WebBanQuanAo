@@ -1,0 +1,170 @@
+﻿<div class="side-nav">
+    <div class="side-nav-inner">
+        <ul class="side-nav-menu scrollable ps-container ps-theme-default ps-active-y">
+            <li class="nav-item">
+                <a href="@Url.Action("Index","Dashboard")" asp-action="Index" asp-controller="Dashboard">
+                    <span class="icon-holder">
+                        <i class="anticon anticon-dashboard"></i>
+                    </span>
+                    <span class="title">Dashboard</span>
+                    <span class="arrow">
+                        <i class="arrow-icon"></i>
+                    </span>
+                </a>
+            </li>
+            <hr style="height:2px;border-width:0;color:gray;background-color:gray;margin:0 10px 0 0">
+            <li class="nav-item">
+                <a href="@Url.Action("Index","Order")">
+                    <span class="icon-holder">
+                        <i class="fa-solid fa-clipboard-list"></i>
+                    </span>
+                    <span class="title">Quản lý đơn hàng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="@Url.Action("Index","Sell")">
+                    <span class="icon-holder">
+                        <i class="fa-solid fa-bell-concierge"></i>
+                    </span>
+                    <span class="title">Bán hàng</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="@Url.Action("Index","Voucher")">
+                    <span class="icon-holder">
+                        <i class="fa-solid fa-ticket"></i>
+                    </span>
+                    <span class="title">Chương trình khuyến mãi</span>
+                </a>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="dropdown-toggle" href="javascript:void(0);">
+                    <span class="icon-holder">
+                        <i class="fas fa-dolly-flatbed"></i>
+                    </span>
+                    <span class="title">Nhập hàng</span>
+                    <span class="arrow">
+                        <i class="arrow-icon"></i>
+                    </span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="@Url.Action("Index","Import")">
+                            <span class="icon-holder">
+                                <i class="fas fa-download mr-1"></i>
+                            </span>
+                            <span class="title">Nhập sản phẩm</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("History","Import")">
+                            <span class="icon-holder">
+                                <i class="fas fa-history mr-1"></i>
+                            </span>
+                            <span class="title">Lịch sử nhập</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="dropdown-toggle" href="javascript:void(0);">
+                    <span class="icon-holder">
+                        <i class="fa-solid fa-gears"></i>
+                    </span>
+                    <span class="title">Quản lý hệ thống</span>
+                    <span class="arrow">
+                        <i class="arrow-icon"></i>
+                    </span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="@Url.Action("Index","Product")">
+                            <span class="icon-holder">
+                                <i class="fa-solid fa-shirt mr-1"></i>
+                            </span>
+                            <span class="title">Quản lý sản phẩm</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Index","Branch")">
+                            <span class="icon-holder">
+                                <i class="fas fa-gem mr-1"></i>
+                            </span>
+                            <span class="title">Quản lý thương thiệu</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Index","Category")">
+                            <span class="icon-holder">
+                                <i class="fa-solid fa-layer-group mr-1"></i>
+                            </span>
+                            <span class="title">Quản lý mặt hàng </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Index","Color")">
+                            <span class="icon-holder">
+                                <i class="fa-solid fa-palette mr-1"></i>
+                            </span>
+                            <span class="title">Màu sắc</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Index","Size")">
+                            <span class="icon-holder">
+                                <i class="fa-solid fa-ruler-combined mr-1"></i>
+                            </span>
+                            <span class="title">Kích cỡ</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Index","Slide")">
+                            <span class="icon-holder">
+                                <i class="fa-solid fa-sliders mr-1"></i>
+                            </span>
+                            <span class="title">Slide</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Index","Banner")">
+                            <span class="icon-holder">
+                                <i class="fas fa-rectangle-ad mr-1"></i>
+                            </span>
+                            <span class="title">Banner</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <li class="nav-item dropdown">
+                <a class="dropdown-toggle" href="javascript:void(0);">
+                    <span class="icon-holder">
+                        <i class="fa-solid fa-users-gear"></i>
+                    </span>
+                    <span class="title">Quản lý tài khoản</span>
+                    <span class="arrow">
+                        <i class="arrow-icon"></i>
+                    </span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <a href="@Url.Action("Index","Account")">
+                            <span class="icon-holder">
+                                <i class="fas fa-user-shield mr-1"></i>
+                            </span>
+                            <span class="title">Quản lý User</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Index","Customer")">
+                            <span class="icon-holder">
+                                <i class="fas fa-people-roof mr-1"></i>
+                            </span>
+                            <span class="title">Quản lý khách hàng</span>
+                        </a>
+                    </li>
+
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>

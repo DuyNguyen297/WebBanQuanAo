@@ -1,0 +1,193 @@
+﻿@using FashionShop.Models
+@using FashionShop.Shared;
+@using System.Globalization;
+@using PagedList.Mvc
+@{
+    ViewData["Title"] = "Lịch sử đơn hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@section Styles{
+    <link rel="stylesheet" href="~/Content/order/css/style.css">
+}
+<div class="page-header">
+    <div class="header-sub-title">
+        <nav class="breadcrumb breadcrumb-dash">
+            <a href="@Url.Action("Index","Home")" class="breadcrumb-item"><i class="fa-solid fa-house mr-1"></i>Trang chủ</a>
+            <span class="breadcrumb-item active">Đơn hàng</span>
+        </nav>
+    </div>
+</div>
+<div class="container">
+    <div class="wrapper d-flex" style="font-size:0.9em">
+        <nav id="sidebar">
+            <div class="info-user-order d-flex align-items-center p-2">
+                <div>
+                    <img src="~/Assets/images/account/user-3.jpg"
+                         alt=""
+                         style="width: 60px; height: 60px"
+                         class="avatar avatar-image" />
+                </div>
+                <div class="mx-3">
+                    <p class="font-weight-semibold text-break mb-1">@(Session[Const.USERNAMESESSION]?.ToString())</p>
+                    <p class="font-weight-semibold text-break mb-0">@(Session[Const.USERPHONESESSION]?.ToString())</p>
+                </div>
+            </div>
+            <div class="p-4 pt-5">
+                <ul class="list-unstyled components mb-5">
+                    <li class="active">
+                        <a href="@Url.Action("Index","Order")" data-container="body" data-toggle="popover" data-placement="top" data-content="Lịch sử mua hàng">
+                            <i class="fa fa-shopping-cart mr-2"></i>
+                            Đơn mua
+                        </a>
+                    </li>
+                    <li>
+                        <a href="@Url.Action("Index","Voucher")" data-container="body" data-toggle="popover" data-placement="top" data-content="Voucher của bạn">
+                            <i class="fa fa-ticket mr-2"></i>
+                            Kho Voucher
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <div id="content" class="flex-fill ml-2">
+            <section id="sec-main">
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="tab_all">
+                        <!-- Đơn hàng  -->
+                        @if ((ViewBag.Voucher as List<FashionShop.AreaModels.CreateVoucherModel>).Count > 0 )
+                        {
+                            <div class="search-order">
+                                <form class="d-sm-inline-block form-inline mr-auto my-1 px-2 mw-100 navbar-search">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control bg-light border-0 small"
+                                               placeholder="Bạn có thể tìm kiếm theo tên Voucher" aria-label="Search"
+                                               aria-describedby="basic-addon2" />
+                                        <div class="input-group-append">
+                                            <button class="btn btn-warning" type="button">
+                                                <i class="fa fa-search" aria-hidden="true"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <section class="tab-sec mt-3">
+                                <div class="mt-3 px-4 pt-4 pb-2">
+                                    @foreach (var item in ViewBag.Voucher as List<FashionShop.AreaModels.CreateVoucherModel>)
+                                    {
+                                        <div class="border-top">
+                                            <div class="row justify-content-center py-3">
+                                                <div class="col-md-9 col-xl-9 col-lg-9">
+                                                    <div class="d-flex align-items-center text-break flex-nowrap">
+                                                        <div class="d-flex flex-fill text-break align-items-start">
+                                                            @if (item.VoucherType == VoucherTypeConst.VOUCHERSHIP)
+                                                            {
+                                                                <img class="border rounded flex-shrink-0" width="80" height="80" src="~/Assets/images/voucher/ship.jpg" alt="@item.Name" />
+                                                            }
+                                                            else
+                                                            {
+                                                                <img class="border rounded flex-shrink-0" width="80" height="80" src="~/Assets/images/voucher/other.jpg" alt="@item.Name" />
+                                                            }
+
+                                                            <div class="flex-fill text-wrap d-flex align-items-start flex-column pl-2">
+                                                                <div class="mb-1">
+                                                                    <span>
+                                                                        @(item.Name)
+                                                                    </span>
+                                                                </div>
+                                                                <div>
+                                                                    @{
+                                                                        string SubVoucherType(string voucher)
+                                                                        {
+                                                                            switch (voucher)
+                                                                            {
+                                                                                case VoucherTypeConst.VOUCHERSHIP:
+                                                                                    return "Voucher phí giao hàng";
+                                                                                case VoucherTypeConst.VOUCHERCUSTOMER:
+                                                                                    return "Voucher dành cho khách hàng";
+                                                                                case VoucherTypeConst.VOUCHERPRODUCT:
+                                                                                    return "Voucher theo sản phẩm";
+                                                                                case VoucherTypeConst.VOUCHERCATEGORY:
+                                                                                    return "Voucher theo danh mục";
+                                                                                default:
+                                                                                    return "Voucher";
+                                                                            }
+                                                                        }
+                                                                        string DateSwitch(string startDay, string endDay)
+                                                                        {
+                                                                            var start = DateTime.ParseExact(startDay, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                                                                            var end = DateTime.ParseExact(endDay, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+                                                                            if (DateTime.Now > end)
+                                                                            {
+                                                                                return "Voucher Đã hết hạn";
+                                                                            }
+                                                                            else if (DateTime.Now > start)
+                                                                            {
+                                                                                var day = (DateTime.Now - start).Days;
+                                                                                if (day < 10)
+                                                                                {
+                                                                                    return "Sắp hết hạn";
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    return "Chưa hết hạn";
+                                                                                }
+                                                                            }
+                                                                            return "";
+                                                                        }
+                                                                    }
+                                                                    <div class="mb-1 text-muted-order">
+                                                                        Phân loại Voucher:
+                                                                        <span> @(SubVoucherType(item.VoucherType)) </span>,
+                                                                        <span>Từ: @(item.StartDate)</span>
+                                                                        <span> Đến: @(item.EndDate)</span>
+                                                                    </div>
+                                                                    <div>
+                                                                        x@(item.Quantity)
+                                                                        <span class="type-day"> @(DateSwitch(item.StartDate, item.EndDate)) </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 col-xl-3 col-lg-3 border-sm-start-none border-left">
+                                                    <div class="d-flex align-items-center text-break flex-nowrap justify-content-end h-100">
+                                                        <div class="type-m">
+                                                            <span class="font-size-12">Áp dụng cho đơn hàng trên: @(item.TotalCondition?.ToString("n0"))</span><br />
+                                                            <span class="text-muted">Số tiền giảm:</span>
+                                                            <span class="m-vnd-gg m-gg"> @(item.Discount?.ToString("n0")) VNĐ</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <hr class="my-1" />
+                                    }
+                                </div>
+
+                            </section>
+                        }
+                        else
+                        {
+                            <section class="tab-sec mt-3">
+                                <div class="block-pay">
+                                    <div class="bl-pay-style">
+                                        <div class="bl-pay-img"></div>
+                                        <h2 class="bl-pay-text">không có voucher nào</h2>
+                                    </div>
+                                </div>
+                            </section>
+                        }
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script>
+
+    </script>
+}

@@ -1,0 +1,78 @@
+﻿@using FashionShop.Shared
+@model FashionShop.Models.Account
+@{
+    ViewData["Title"] = "Profile";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<div class="content-wrapper">
+    <!-- Main content -->
+    <section class="content my-2">
+        <form asp-action="">
+            <div class="page-header">
+                <div class="header-sub-title">
+                    <nav class="breadcrumb breadcrumb-dash">
+                        <a href="@Url.Action("Index","Dashboard")" class="breadcrumb-item"><i class="fa-solid fa-house mr-1"></i>Trang chủ</a>
+                        <span class="breadcrumb-item active">Thông tin</span>
+                    </nav>
+                </div>
+            </div>
+            <!-- Default box -->
+            <div class="tab-content m-t-15">
+                <div class="tab-pane fade show active">
+                    <div class="card">
+                        <div class="card-body">
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label class="font-weight-semibold" for="ShortDesc">Tên đăng nhập</label>
+                                    <div class="form-control">@Html.DisplayFor(model => model.UserName)</div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label class="font-weight-semibold" for="ShortDesc">Tên người sử dụng</label>
+                                    <div class="form-control">@Html.DisplayFor(model => model.Name)</div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label class="font-weight-semibold" for="ShortDesc">Số điện thoại</label>
+                                    <div class="form-control">@Html.DisplayFor(model => model.Phone)</div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label class="font-weight-semibold" for="ShortDesc">Email</label>
+                                    <div class="form-control">@Html.DisplayFor(model => model.Email)</div>
+                                </div>
+                            </div>
+                            <div class=" row">
+                                <div class="form-group col-md-6">
+                                    <label class="font-weight-semibold" for="ShortDesc">Ngày tạo</label>
+                                    <div class="form-control">
+                                        @(Model.CreatedAt?.ToString("dd/MM/yyyy hh:mm tt"))
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label class="font-weight-semibold" for="productCategory">Quyền </label>
+                                    <div class="form-control">
+                                        @if (Model.Role == Const.ADMIN)
+                                        {
+                                            <span class="badge badge-success rounded-pill d-inline">Admin</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-warning rounded-pill d-inline">User</span>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <a class=" btn btn-primary fa fa-solid fa-arrow-left" href="@Url.Action("Index","Dashboard")"></a>
+                        <a class=" btn btn-success fas fa-edit" href="@Url.Action("Edit", "Account", new {id=@Model.Id})"> </a>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </section>
+    <!-- /.content -->
+</div>

@@ -1,0 +1,287 @@
+﻿@using FashionShop.Models;
+@using FashionShop.Shared;
+@using PagedList.Mvc;
+@model PagedList.IPagedList<FashionShop.Models.Order>
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="input-affix">
+                            <i class="prefix-icon anticon anticon-search opacity-04"></i>
+                            <input id="keyword" name="keyword" type="text" class="form-control" placeholder="Tìm kiếm đơn hàng">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 text-right">
+                <a class="btn btn-primary text-light"><i class="fas fa-check"></i> Xử lý tất cả</a>
+            </div>
+        </div>
+        <div class="table-responsive table-hover">
+            @if (Model.Count > 0)
+            {
+                <table id="table_click" class="table align-middle mb-0 bg-white">
+                    <thead class="thead-dark">
+                        <tr class="info">
+                            <th>#Thông tin</th>
+                            <th>Khách hàng</th>
+                            <th>Thời gian</th>
+                            <th class="text-center">Thanh toán</th>
+                            <th>Tổng tiền</th>
+                            @if (Model[0].Status == StatusConst.CANCEL || Model[0].Status == StatusConst.RETURN)
+                            {
+                                <th class="text-center">Cập nhật</th>
+                            }
+                            <th class="text-center" style="min-width: 120px">@((ViewBag.StatusList as Dictionary<string,string>).FirstOrDefault(v => v.Key == Model[0].Status).Value)</th>
+                            <th class="text-center">Hóa đơn</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            foreach (var item in Model)
+                            {
+                                                <tr data-toggle="collapse" class="accordion-toggle" data-target="#@($"row_{item.Id}")">
+                                                    <td>
+                                                        <input type="hidden" id="name-@item.Id" name="name-@item.Id" value="@item.Name" />
+                                                        <input type="hidden" id="code-@item.Id" name="code-@item.Id" value="@item.Code" />
+                                                        <input type="hidden" id="phone-@item.Id" name="phone-@item.Id" value="@item.Phone" />
+                                                        <input type="hidden" id="address-@item.Id" name="address-@item.Id" value="@item.Address" />
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="mx-3">
+                                                                <p class="font-weight-bold mb-1">Số sản phẩm:<span class="font-weight-bold"> @(item.OrderDetails?.Count)</span></p>
+                                                                <p class="mb-0"><span class="font-weight-semibold">#@item.Code</span></p>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <p class="mb-1">Tên:<span class="font-weight-semibold"> @(item.Name)</span></p>
+                                                        <p class="mb-0">Số điện thoại:<span class="font-weight-semibold"> @(item.Phone)</span></p>
+                                                    </td>
+                                                    <td>
+                                                        <p class="mb-1">Đặt:<span class="font-weight-semibold"> @(item.CreatedAt?.ToString("dd/MM/yyyy hh:mm tt"))</span></p>
+                                                        @{
+                                                            if (item.ReceiveDate == null)
+                                                            {
+                                                                <p class="mb-0">Nhận:<span class="font-weight-semibold"> Chưa nhận hàng</span></p>
+                                                            }
+                                                            else
+                                                            {
+                                                                <p class="mb-0">Nhận:<span class="font-weight-semibold"> @(item.ReceiveDate?.ToString("dd/MM/yyyy hh:mm tt"))</span></p>
+                                                            }
+                                                        }
+
+                                                    </td>
+                                                    <td class="text-center">
+                                                        @{
+                                                            if (item.PayWay == FashionShop.Shared.PayConst.OFFLINE)
+                                                            {
+                                                                <p class="mb-0"><span class="badge badge-warning">@PayConst.OFFLINE</span></p>
+                                                            }
+                                                            else if (item.PayWay == FashionShop.Shared.PayConst.ONLINE)
+                                                            {
+                                                                <p class="mb-0"><span class="badge badge-success">@PayConst.ONLINE</span></p>
+                                                            }
+                                                        }
+                                                    </td>
+                                                    <td class="font-weight-semibold text-nowrap">
+                                                        @(item.Total?.ToString("n0")) VNĐ
+                                                    </td>
+                                                    @if (Model[0].Status != StatusConst.DONE && Model[0].Status != StatusConst.CANCEL && Model[0].Status != StatusConst.RETURN)
+                                                    {
+                                                        <td class="text-center">
+                                                            <a id="@item.Id" class="btn btn-sm btn-icon btn-tone btn-rounded btn-success anticon anticon-check-circle" href="@Url.Action("Skip", new {id=item.Id})"
+                                                               data-toggle="tooltip" data-placement="top" title="@((ViewBag.StatusList as Dictionary<string,string>).FirstOrDefault(v =>v.Key == Model[0].Status).Value)">
+                                                            </a>
+                                                            @if (Model[0].Status == StatusConst.SHIPPING)
+                                                            {
+                                                                <button id="@item.Id" onclick="rejectOrder(this.id)" class="btn btn-sm btn-icon btn-tone btn-rounded btn-warning anticon anticon-retweet return"
+                                                                        data-toggle="tooltip" data-placement="top" title="Giao không thành công">
+                                                                </button>
+                                                            }
+                                                            @if ((ViewBag.CancelStatusList as Dictionary<string, string>).ContainsKey(Model[0].Status))
+                                                            {
+                                                                <button id="@item.Id" onclick="editOrder(this.id)" class="btn btn-sm btn-icon btn-tone btn-rounded btn-primary anticon anticon-edit"
+                                                                        data-toggle="tooltip" data-placement="top" title="Cập nhật thông tin">
+                                                                </button>
+                                                                <button id="@item.Id" onclick="cancelOrder(this.id)" class="btn btn-sm btn-icon btn-tone btn-rounded btn-danger anticon anticon-close"
+                                                                        data-toggle="tooltip" data-placement="top" title="Hủy đơn hàng">
+                                                                </button>
+                                                            }
+                                                        </td>
+
+                                                    }
+                                                    @if (Model[0].Status == StatusConst.DONE)
+                                                    {
+                                                        <td class="text-center">
+                                                            @if ((DateTime.Now - item.ReceiveDate)?.TotalDays <= 7)
+                                                            {
+                                                                <button id="@item.Id" onclick="returnOrder(this.id)" class="btn btn-sm btn-icon btn-tone btn-rounded btn-warning anticon anticon-retweet"
+                                                                        data-toggle="tooltip" data-placement="top" title="Trả hàng">
+                                                                </button>
+                                                            }
+                                                            else
+                                                            {
+                                                                <button id="@item.Id" class="btn btn-sm btn-icon btn-tone btn-rounded btn-danger anticon anticon-stop"
+                                                                        data-toggle="tooltip" data-placement="top" data-container="body" data-html="true" title="Không thể trả hàng! <br> Đã quá hạn 7 ngày.">
+                                                                </button>
+                                                            }
+                                                        </td>
+                                                    }
+                                                    @if (Model[0].Status == StatusConst.CANCEL)
+                                                    {
+                                                        <td class="text-center">
+                                                            @if (!item.IsBlackOrder)
+                                                            {
+                                                            <button id="@item.Id" onclick="importOrder(this.id)" class="btn btn-sm btn-icon btn-tone btn-rounded btn-info anticon anticon-file-sync"
+                                                                    data-toggle="tooltip" data-placement="top" title="Cập nhật lại sản phẩm">
+                                                            </button>
+                                                            }
+                                                            else
+                                                            {
+                                                            <button id="@item.Id" class="btn btn-sm btn-icon btn-tone btn-rounded btn-info anticon anticon-file-sync"
+                                                                    data-toggle="tooltip" data-placement="top" data-container="body" title="Sản phẩm đã được cập nhật trước đó">
+                                                            </button>
+                                                            }
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button id="@item.Id" onclick="deleteOrder(this.id)" class="btn btn-sm btn-icon btn-tone btn-rounded btn-danger anticon anticon-delete"
+                                                                    data-toggle="tooltip" data-placement="top" title="Xóa đơn hàng">
+                                                            </button>
+                                                        </td>
+                                                    }
+                                                    @if (Model[0].Status == StatusConst.RETURN)
+                                                    {
+                                                        <td class="text-center">
+                                                            @if (!item.IsBlackOrder)
+                                                            {
+                                                                <button id="@item.Id" onclick="importOrder(this.id)" class="btn btn-sm btn-icon btn-tone btn-rounded btn-info anticon anticon-file-sync"
+                                                                        data-toggle="tooltip" data-placement="top" data-html="true" title="@(item.PayStatus == PayStatusConst.DONE ? "<strong>Hoàn tiền</strong> <br> Cập nhật lại sản phẩm" : "Cập nhật lại sản phẩm")">
+                                                                </button>
+                                                            }
+                                                            else
+                                                            {
+                                                                <button id="@item.Id" class="btn btn-sm btn-icon btn-tone btn-rounded btn-info anticon anticon-file-sync"
+                                                                        data-toggle="tooltip" data-placement="top" data-container="body" title="Sản phẩm đã được cập nhật trước đó">
+                                                                </button>
+                                                            }
+
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button id="@item.Id" onclick="reSetupOrder(this.id)" class="btn btn-sm btn-icon btn-tone btn-rounded btn-warning anticon anticon-rollback"
+                                                                    data-toggle="tooltip" data-placement="top" title="Chuẩn bị lại đơn">
+                                                            </button>
+                                                        </td>
+                                                    }
+                                                    <td class="text-center">
+                                                        <button class="btn btn-sm btn-icon btn-tone btn-hover btn-rounded anticon anticon-eye" id="@item.Id" onclick="GetBill(this)" data-toggle="tooltip" data-placement="top" title="Xem hóa đơn"></button>
+                                                    </td>
+                                                </tr>
+                                <tr>
+                                    <td colspan="12" class="hiddenRow p-0">
+                                        <div class="accordian-body collapse table-responsive pl-5" style="border-left: 5px black solid" id="@($"row_{item.Id}")">
+                                            <table class="table table-sm m-0" style="background-color: beige">
+                                                <thead class="thead-dark">
+                                                    <tr>
+                                                        <th>#Sản phẩm</th>
+                                                        <th>Giá</th>
+                                                        <th class="text-center">Màu</th>
+                                                        <th class="text-center">Size</th>
+                                                        <th class="text-center">Số lượng</th>
+                                                        <th>Tổng tiền</th>
+                                                        <th class="text-center"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @{
+                                                        foreach (var ite in item.OrderDetails)
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    <div class="d-flex align-items-center">
+                                                                        <img src="~/Assets/images/product/@(ite.Product?.Image)"
+                                                                             alt=""
+                                                                             style="width: 50px; height: 50px"
+                                                                             class="avatar avatar-image rounded" />
+                                                                        <div class="mx-3">
+                                                                            <p class="font-weight-bold mb-1">@(ite.Product?.Name)</p>
+                                                                            <p class="mb-0">#@(ite.Product?.Code)</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <p class="mb-1">Giá bán:<span class="text-nowrap font-weight-semibold"> @(ite.Product?.Price?.ToString("n0"))</span></p>
+                                                                    <p class="mb-0 text-muted">Giảm giá:<span class="text-nowrap"> @(ite.Product?.Discount?.ToString("n0"))</span></p>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    @{
+                                                                        string color = (ViewBag.ColorId as List<Color>).FirstOrDefault(c => c.Id == ite.Product?.ColorId)?.Code;
+                                                                    }
+                                                                    <span class="badge text-dark" style="background-color:@(color)">@(color)</span>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    @{
+                                                                        string size = (ViewBag.SizeId as List<Size>).FirstOrDefault(c => c.Id == ite.Product?.SizeId)?.Code;
+                                                                    }
+                                                                    <span class="badge badge-dark font-weight-bold">@(size)</span>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <span class="badge badge-pill badge-dark font-weight-bold">@(ite.Quantity)</span>
+                                                                </td>
+                                                                <td class="text-nowrap">@(ite.Total?.ToString("n0")) VNĐ</td>
+                                                                <td class="text-center">
+                                                                    @if ((ViewBag.CancelStatusList as Dictionary<string, string>).ContainsKey(Model[0].Status))
+                                                                    {
+                                                                        @*<label data-toggle="collapse" data-target="#@($"rowSub_{ite.Id}")" 
+                                                                               class="accordion-toggle btn btn-icon btn-hover btn-sm btn-rounded anticon anticon-edit"
+                                                                               style="cursor:pointer">
+                                                                        </label>*@
+                                                                        <button data-container="body" data-toggle="popover" data-content="Chức năng đang phát triển."
+                                                                               class="btn btn-icon btn-hover btn-sm btn-rounded anticon anticon-edit"
+                                                                               style="cursor:pointer">
+                                                                        </button>
+                                                                    }
+                                                                    <a class="btn btn-icon btn-hover btn-sm btn-rounded anticon anticon-info-circle"
+                                                                       href="@Url.Action("Details", "Product", new {id=ite.ProductId})">
+                                                                    </a>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="12" class="hiddenRow p-0">
+                                                                    <div class="accordian-body collapse table-responsive pl-5" style="border-left: 5px black solid" id="@($"rowSub_{ite.Id}")">
+                                                                        <table class="table table-responsive">
+                                                                            <tbody>
+                                                                                Đang phát triển
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+                <div aria-label="Page navigation example" class="my-3">
+                    @Html.PagedListPager(
+                        Model,
+                        page => Url.Action("Index", new { page })
+                    )
+                </div>
+            }
+            else
+            {
+                <div class="text-muted font-italic">
+                    Không có đơn hàng nào
+                </div>
+            }
+        </div>
+    </div>
+</div>

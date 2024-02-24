@@ -1,0 +1,71 @@
+﻿@model FashionShop.Models.VoucherShip
+
+@{
+    ViewData["Title"] = "Xóa voucher";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<div class="card">
+    <div class="card-body">
+ <!-- Main content -->
+        <section class="content my-2">
+            <form action="@Url.Action("DeleteVoucherShip", new {id = Model.Id})" method="post">
+                <div class="page-header">
+                    <div class="header-sub-title">
+                        <nav class="breadcrumb breadcrumb-dash">
+                            <a href="@Url.Action("Index","Dashboard")" class="breadcrumb-item"><i class="fa-solid fa-house mr-1"></i>Trang chủ</a>
+                            <a href="@Url.Action("Index","Voucher")" class="breadcrumb-item">Voucher </a>
+                            <span class="breadcrumb-item active">Xóa voucher phí giao hàng</span>
+                        </nav>
+                    </div>
+                </div>
+                <!-- Default box -->
+
+                <div class="card-header">
+                    <div class="row">
+                        <div class=" col-md-6">
+                        </div>
+                        <div class=" col-md-6 text-right">
+                            <a class=" btn btn-primary fa fa-solid fa-arrow-left" href="@Url.Action("Index")"></a>
+                            <button class=" btn btn-danger far fa-trash-alt" type="submit"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="row">
+                        <div class="form-group col-md-12">
+                            <label class="control-label">Tên</label>
+                            <div class="form-control">@Html.DisplayFor(model => model.Name)</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-8">
+                            <label>Thời gian voucher có hiệu lực</label>
+                            <div class="d-flex align-items-center">
+                                <input type="text" class="form-control datepicker-input" name="StartDate" value="@(Model.StartDate?.ToString("MM/dd/yyyy"))" placeholder="Bắt đầu">
+                                <span class="p-h-10">Đến</span>
+                                <input type="text" class="form-control datepicker-input" name="EndDate" value="@(Model.EndDate?.ToString("MM/dd/yyyy"))" placeholder="Đến hết ngày">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label class="control-label">Số lượng</label>
+                            <div class="form-control">@Html.DisplayFor(model => model.Quantity)</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="control-label">Giá trị đơn hàng tối thiểu</label>
+                            <div class="form-control">@Html.DisplayFor(model => model.TotalCondition)</div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label name="Code" class="control-label">Số tiền giảm</label>
+                            <div class="form-control">@Html.DisplayFor(model => model.Discount)</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+
+            </form>
+        </section>
+    </div>
+</div>

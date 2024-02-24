@@ -1,0 +1,95 @@
+﻿@model FashionShop.Models.Branch
+
+@{
+    ViewData["Title"] = "Thêm thương hiệu";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<div class="card">
+    <div class="card-body">
+        <form action="@Url.Action("Create")" method="post" enctype="multipart/form-data">
+            <div class="page-header">
+                <div class="header-sub-title">
+                    <nav class="breadcrumb breadcrumb-dash">
+                        <a href="@Url.Action("Index","Dashboard")" class="breadcrumb-item"><i class="fa-solid fa-house mr-1"></i>Trang chủ</a>
+                        <a href="@Url.Action("Index","Branch")" class="breadcrumb-item">Thương hiệu</a>
+                        <span class="breadcrumb-item active">Thêm</span>
+                    </nav>
+                </div>
+            </div>
+            <!-- Default box -->
+
+            <div class="card-header">
+                <div class="row">
+                    <div class=" col-md-6">
+
+                    </div>
+                    <div class=" col-md-6 text-right">
+                        <a class=" btn btn-success fa fa-solid fa-arrow-left" href="@Url.Action("Index","Branch")"></a>
+                        <button class="btn btn-primary" type="submit"><i class="fas fa-plus-circle mr-1"></i>Xác nhận</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div>
+                    <select class="select2" name="states[]" multiple="multiple">
+                        <option value="AP">Apples</option>
+                        <option value="NL">Nails</option>
+                        <option value="BN">Bananas</option>
+                        <option value="HL">Helicopters</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label name="Name" class="control-label">Tên</label>
+                    @Html.EditorFor(model => model.Name, "", new { htmlAttributes = new { @class = "form-control", @placeholder = "Tên thương hiệu", @required = "required" } })
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label name="Code" class="control-label">Mã</label>
+                        @Html.EditorFor(model => model.Code, "", new { htmlAttributes = new { @class = "form-control", @placeholder = "Mã thương hiệu", @required = "required" } })
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label name="Outstanding" class="control-label">Nổi bật</label>
+                        @Html.CheckBoxFor(model => model.Outstanding, new { @class = "form-control" })
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label class="font-weight-semibold" for="">Ảnh</label>
+                        <div class="input-group custom-file-button">
+                            <label class="input-group-text" for="inputGroupFile">Chọn ảnh thương hiệu</label>
+                            <input type="file" name="fThumb" accept="image/*" class="form-control" required id="inputGroupFile" onchange="changePreImage(this)">
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <img id="previewImage" class="rounded border-0" width="100" height="100" style="object-fit:cover" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label name="Description" class="control-label">Mô tả</label>
+                    @Html.TextAreaFor(model => model.Description, new { @class = "form-control", @placeholder = "Mô tả" })
+                </div>
+            </div>
+        </form>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.content -->
+</div>
+
+@section Scripts{
+    <script>
+        function changePreImage(input) {
+            var preview = document.getElementById('previewImage');
+
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        };
+    </script>
+}

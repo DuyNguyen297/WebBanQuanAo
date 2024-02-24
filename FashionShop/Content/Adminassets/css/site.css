@@ -1,0 +1,34 @@
+﻿/*dec,inc button*/
+.product-count .qtyminus,
+.product-count .qtyplus {
+    width: 36px;
+    height: 36px;
+    font-weight: normal;
+    text-align: center;
+    line-height: 36px;
+    border: 1px solid #d7d7d7;
+    color: #000;
+    cursor: pointer;
+    background-color: #fff;
+}
+
+.product-count .qtyminus {
+    border-radius: 0;
+}
+
+.product-count .qtyplus {
+    border-radius: 0;
+}
+
+.product-count .qty {
+    margin: 0;
+    padding: 0;
+    width: 50px;
+    height: 36px;
+    font-size: 0.9rem;
+    text-align: center;
+    background-color: #fff;
+    border: none;
+    border-top: 1px solid #d7d7d7;
+    border-bottom: 1px solid #d7d7d7;
+}

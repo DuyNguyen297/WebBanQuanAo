@@ -1,0 +1,91 @@
+﻿@using PagedList.Mvc
+@model PagedList.IPagedList<FashionShop.Models.Color>
+
+@{
+    int CurrentPage = ViewBag.CurrentPage;
+    ViewData["Title"] = "Danh sách danh mục" + CurrentPage;
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<div class="page-header">
+    <div class="header-sub-title">
+        <nav class="breadcrumb breadcrumb-dash">
+            <a href="@Url.Action("Index","Dashboard")" class="breadcrumb-item"><i class="fa-solid fa-house mr-1"></i>Trang chủ</a>
+            <span class="breadcrumb-item active">Màu sắc: trang @CurrentPage </span>
+        </nav>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="input-affix">
+                           <form method="get">
+                               <i class="prefix-icon anticon anticon-search opacity-04"></i>
+                               <input id="searchkey" name="searchkey" type="text" class="form-control" placeholder="Tìm kiếm màu sắc">
+                          </form>                         
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 text-right">
+                <a class="btn btn-primary" href="@Url.Action("Create", "Color")"><i class="anticon anticon-plus-circle m-r-5"></i><span>Thêm</span></a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover e-commerce-table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th class="text-center">#</th>
+                        <th class="text-center">Tên</th>
+                        <th class="text-center">Mã</th>
+                        <th scope="col" class="text-center" style="min-width: 120px;">Chức năng</th>
+                    </tr>
+                </thead>
+                <tbody id="records_table">
+                    @if (Model != null)
+                    {
+                        int i = 0;
+                        foreach (var item in Model)
+                        {
+                            i += 1;
+                            <tr>
+                                <td scope="row" class="text-center">
+                                    @i
+                                </td>
+                                <td scope="row" class="text-center">@item.Name</td>
+                                <td scope="row" class="text-center">
+                                    <span class="d-flex align-items-center justify-content-center">
+                                        <span class="badge badge-dot product-color m-r-5" style="background-color:@item.Code"></span>
+                                        <span>@item.Code</span>
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <a class="btn btn-icon btn-hover btn-sm btn-rounded" href="@Url.Action("Details", new {id = item.Id})"><i class="anticon anticon-info-circle"></i></a>
+                                    <a class="btn btn-icon btn-hover btn-sm btn-rounded" href="@Url.Action("Edit", new {id = item.Id})"><i class="anticon anticon-edit"></i></a>
+                                    <a class="btn btn-icon btn-hover btn-sm btn-rounded" href="@Url.Action("Delete", new {id = item.Id})"><i class="anticon anticon-delete"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    }
+
+
+                </tbody>
+            </table>
+            <div aria-label="Page navigation example" class="my-3">
+                @Html.PagedListPager(
+                    Model,
+                    page => Url.Action("Index", new { page })
+                )
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+
+    </script>
+}

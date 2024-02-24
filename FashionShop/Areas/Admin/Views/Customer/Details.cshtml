@@ -1,0 +1,71 @@
+﻿@model FashionShop.Models.Customer
+
+@{
+    ViewData["Title"] = "Chi tiết";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<div class="card">
+    <div class="card-body">
+        <!-- Main content -->
+        <section class="content my-2">
+            <form asp-action="Details">
+                <div class="page-header">
+                    <div class="header-sub-title">
+                        <nav class="breadcrumb breadcrumb-dash">
+                            <a href="@Url.Action("Index","Dashboard")" class="breadcrumb-item"><i class="fa-solid fa-house mr-1"></i>Trang chủ</a>
+                            <a href="@Url.Action("Index","Customer")" class="breadcrumb-item">Danh sách</a>
+                            <span class="breadcrumb-item active">Chi tiết</span>
+                        </nav>
+                    </div>
+                </div>
+                <!-- Default box -->
+
+                <div class="card-header">
+                    <div class="row my-1">
+                        <div class="col-md-6">
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <a class="btn btn-success fa fa-solid fa-arrow-left" href="@Url.Action("Index")"></a>
+                            <a class="btn btn-primary fas fa-edit" href="@Url.Action("Edit", new {id=@Model.Id})"> </a>
+                            <a class="btn btn-danger far fa-trash-alt" href="@Url.Action("Delete", new {id=@Model.Id})"> </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-semibold" for="ShortDesc">Tên người sử dụng</label>
+                            <div class="form-control">@Html.DisplayFor(model => model.Name)</div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-semibold" for="ShortDesc">Số điện thoại</label>
+                            <div class="form-control">@Html.DisplayFor(model => model.Phone)</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-semibold" for="ShortDesc">Email</label>
+                            <div class="form-control">@Html.DisplayFor(model => model.Email)</div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-semibold" for="ShortDesc">Địa chỉ</label>
+                            <div class="form-control">@Html.DisplayFor(model => model.Address)</div>
+                        </div>
+                    </div>
+                    <div class=" row">
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-semibold" for="ShortDesc">Ngày tạo</label>
+                            <div class="form-control">
+                                @(Model.CreatedAt?.ToString("dd/MM/yyyy hh:mm tt"))
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+
+            </form>
+        </section>
+    </div>
+    <!-- /.content -->
+</div>

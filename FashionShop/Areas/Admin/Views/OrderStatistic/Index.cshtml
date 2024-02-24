@@ -1,0 +1,119 @@
+﻿@model PagedList.IPagedList<FashionShop.Models.Order>
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~Areas/Admin/Views/Shared/_GlobalLayout.cshtml";
+}
+
+
+<div class="page-header card">
+    <div class="row align-items-end">
+        <div class="col-lg-8">
+            <div class="page-header-title">
+                <i class="feather icon-home bg-c-blue"></i>
+                <div class="d-inline">
+                    <h5>Admin</h5>
+                    <span>Manager</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="page-header-breadcrumb">
+                <ul class=" breadcrumb breadcrumb-title">
+                    <li class="breadcrumb-item">
+                        <a href="index.html"><i class="feather icon-home"></i></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="pcoded-inner-content">
+    <div class="main-body">
+        <div class="page-wrapper">
+            <div class="page-body">
+                <div class="col-md-12">
+                    <div class="card table-card">
+                        <div class="card-header">
+                            <h5>Doanh thu</h5>
+                            <div class="card-header-right">
+                                <ul class="list-unstyled card-option">
+                                    <li class="first-opt"><i class="feather icon-chevron-left open-card-option"></i></li>
+                                    <li><i class="feather icon-maximize full-card"></i></li>
+                                    <li><i class="feather icon-minus minimize-card"></i></li>
+                                    <li><i class="feather icon-chevron-left open-card-option"></i></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <form method="post" action="~/Frofit/ViewRevenue">
+                            <div class="card-block p-b-0">
+                                <div class="col-sm-3">
+                                    Từ ngày: <input required name="from_date" type="date" class="form-control" />
+                                </div>
+                                <div class="col-sm-3">
+                                    Đến ngày: <input required name="to_date" type="date" class="form-control" />
+                                </div>
+                                <br />
+                                <button type="submit" style="margin-left:-48%;margin-top:50px;margin-bottom:35px;" class="btn btn-success">Xem doanh thu</button>
+                                <br />
+                                @if (@ViewBag.SumToTal == null)
+                                {
+                                    <div class="col-sm-3">
+                                        Tổng doanh thu: <input value="0$" disabled="disabled" type="text" class="form-control" />
+                                    </div>
+                                    <div class="col-sm-3">
+                                        Số lượng đơn hàng: <input value="0" disabled="disabled" type="text" class="form-control" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-sm-3">
+                                        Tổng doanh thu: <input value="@ViewBag.SumToTal$" disabled="disabled" type="text" class="form-control" />
+                                    </div>
+                                    <div class="col-sm-3">
+                                        Số lượng đơn hàng: <input value="@ViewBag.GetQuantityOrder" disabled="disabled" type="text" class="form-control" />
+                                    </div>
+                                }
+                                <div class="table-responsive">
+                                    <table style="margin-top:20px!important;" id="dtBasicExample" class="table table-hover m-b-0 table-striped table-bordered table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Khách hàng</th>
+                                                <th>Ngày đặt</th>
+                                                <th>Địa chỉ</th>
+                                                <th>Số điện thoại</th>
+                                                <th>Ngày giao</th>
+                                                <th>Thành tiền</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @if (ViewBag.GetBills == null)
+                                            {
+                                                <tr>
+                                                    <td style="text-align:center;font-weight:bold;color:red;font-family:'Times New Roman';font-size:18px;" colspan="4">KHÔNG CÓ DỮ LIỆU</td>
+                                                </tr>
+                                            }
+                                            else
+                                            {
+                                                @if (Model != null)
+                                                {
+                                                foreach (var b in Model)
+                                                {
+                                                    <tr id="row_@b.Id">
+                                                        <td>@b.Name</td>
+                                                        <td>@b.CreatedAt</td>
+                                                        <td>@b.Total</td>
+                                                    </tr>
+                                                }}
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

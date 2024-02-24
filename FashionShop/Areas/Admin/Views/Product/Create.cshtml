@@ -1,0 +1,354 @@
+﻿@using FashionShop.AreaModels
+@using FashionShop.Shared
+@model FashionShop.AreaModels.CreateProductModel
+@{
+    ViewData["Title"] = "Thêm sản phẩm";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+@section Styles{
+    <link href="~/Content/Adminassets/summernote/summernote-bs4.css" rel="stylesheet" />
+    <link href="~/Content/Adminassets/summernote/summernote.css" rel="stylesheet" />
+}
+<form action="@Url.Action("Create")" method="post" enctype="multipart/form-data">
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+    <div class="page-header">
+        <div class="header-sub-title">
+            <nav class="breadcrumb breadcrumb-dash">
+                <a href="@Url.Action("Index","Dashboard")" class="breadcrumb-item"><i class="fa-solid fa-house mr-1"></i>Trang chủ</a>
+                <a href="@Url.Action("Index","Product")" class="breadcrumb-item">Sản phẩm</a>
+                <span class="breadcrumb-item active">Thêm mới</span>
+            </nav>
+        </div>
+    </div>
+    <div class="page-header no-gutters has-tab">
+        <div class="d-md-flex m-b-15 align-items-center justify-content-between">
+            <div class="col-md-6">
+            </div>
+            <div class="col-md-6 text-right">
+                <div class="text-right">
+                    <a class="btn btn-success fa fa-solid fa-arrow-left" href="@Url.Action("Index","Product")"></a>
+                    <button class="btn btn-primary" type="submit"><i class="fas fa-plus-circle mr-1"></i>Xác nhận</button>
+                </div>
+            </div>
+        </div>
+        <ul class="nav nav-tabs">
+            <li class="nav-item">
+                <a class="nav-link active" data-toggle="tab" href="#product-edit-basic">Thông tin sản phẩm</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#product-edit-option">Thông số</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-toggle="tab" href="#product-edit-description">Mô tả</a>
+            </li>
+        </ul>
+    </div>
+    <div class="tab-content m-t-15">
+        <div class="tab-pane fade show active" id="product-edit-basic">
+            <div class="card">
+                <div class="card-body">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="form-group">
+                        <label class="font-weight-semibold" for="productName">Tên sản phẩm</label>
+                        @Html.EditorFor(model => model.Name, "", new { htmlAttributes = new { @class = "form-control", @placeholder = "Tên sản phẩm", @required = "required" } })
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-semibold" for="productBranch">Thương hiệu</label>
+                            @Html.DropDownListFor(model => model.BranchId, (SelectList)ViewBag.BranchId, "-- Chọn thương hiệu --", new { @class = "custom-select", @style = "min-width: 200px;", @required = "required" })
+                            @*<select class="custom-select" name="BranchId" style="min-width: 200px;" required>
+                                    @{
+                                        var branchItems = (SelectList)ViewBag.BranchId;
+                                        foreach (var item in branchItems)
+                                        {
+                                            <option value="@item.Value" @(item.Selected ? "selected" : "")>@item.Text</option>
+                                        }
+                                    }
+                                </select>*@
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-semibold" for="productCategory">Danh mục</label>
+                            @Html.DropDownListFor(model => model.CategoryId, (SelectList)ViewBag.CategoryId, "-- Chọn danh mục --", new { @class = "custom-select", @style = "min-width: 200px;", @required = "required" })
+                            @* <select class="custom-select" name="CategoryId" style="min-width: 200px;" required>
+                                    @{
+                                        var catItems = (SelectList)ViewBag.CategoryId;
+                                        foreach (var item in catItems)
+                                        {
+                                            <option value="@item.Value" @(item.Selected ? "selected" : "")>@item.Text</option>
+                                        }
+                                    }
+                                </select>*@
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-semibold" for="">Mã </label>
+                            @Html.EditorFor(model => model.Code, "", new { htmlAttributes = new { @class = "form-control", @placeholder = "Mã sản phẩm", @required = "required" } })
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label class="font-weight-semibold" for="">Hiệu lực </label>
+                            @Html.CheckBoxFor(model => model.Effective, new { @class = "form-control" })
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label class="font-weight-semibold" for="">Nổi bật </label>
+                            @Html.CheckBoxFor(model => model.Outstanding, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-semibold" for="">Giá bán</label>
+                            @Html.EditorFor(model => model.Price, "", new { htmlAttributes = new { @class = "form-control", @placeholder = "Giá bán", @required = "required" } })
+                            @*<input type="text" pattern="\d*" class="form-control" name="Price" required>*@
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-semibold" for="">Giảm giá</label>
+                            @Html.EditorFor(model => model.Discount, "", new { htmlAttributes = new { @class = "form-control", @placeholder = "Giảm giá", @required = "required" } })
+                            @*<input type="text" pattern="\d*" class="form-control" name="Discount">*@
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-semibold" for="productBranch">Ảnh</label>
+                            <div class="input-group custom-file-button">
+                                <label class="input-group-text" for="inputGroupFile">Chọn ảnh sản phẩm</label>
+                                <input type="file" name="fThumb" accept="image/*" class="form-control" required id="inputGroupFile" onchange="changePreImage(this)">
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <img id="previewImage" class="rounded border-0" width="100" height="100" style="object-fit:cover" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="product-edit-option">
+            <div class="card">
+                <div class="card-body" >
+                    <div id="color_size_container">
+                        <div asp-validation-summary="All" class="text-danger"></div>
+                        @if (!string.IsNullOrEmpty(Session[Const.COLOR].ToString()))
+                         {
+                            foreach (var cs in ViewBag.ColorSize as List<CreateColorModel>)
+                            {
+                                <div class="row">
+                                    <div class="form-group col-md-6">
+                                        <label class="font-weight-semibold" for="productColor">Màu sắc</label>
+                                        @*@Html.DropDownList("color_0", (SelectList)ViewBag.ColorId, new { @class = "custom-select", @style = "min-width: 200px;", @required = "required", @id = "color_0" })*@
+                                        <select id="color_@(cs.Index.ToString())" class="custom-select" onchange="onSelectedColor(this, @cs.Index)" style="min-width: 200px;background-color:@(((SelectList)ViewBag.ColorId).FirstOrDefault(s=>s.Value == cs.Color)?.Text?.Split('_')[0])" required>
+                                            @{
+                                                var colorItems = (SelectList)ViewBag.ColorId;
+                                                <option value="">-- Chọn màu sắc --</option>
+                                                foreach (var item in colorItems)
+                                                {
+                                                    <option value="@item.Value" @(item.Value == cs.Color ? "selected" : "") style="background-color:@item.Text.Split('_')[0]">@item.Text.Split('_')[1]</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label class="font-weight-semibold" for="productSize">Kích cỡ</label>
+                                        @*@Html.ListBox("color_0_size", (MultiSelectList)ViewBag.SizeId, new { @class = "custom-select", @style = "min-width: 200px;", @id = "color_0_size" })*@
+                                        <select id="color_@(cs.Index.ToString())_size" class="custom-select" onchange="onSelectedSize(this, @cs.Index)" style="min-width: 200px;" multiple required>
+                                            @{
+                                                var sizeItems = (MultiSelectList)ViewBag.SizeId;
+                                                foreach (var item in sizeItems)
+                                                {
+                                                    <option value="@item.Value" @(cs.Size?.Length > 0 && cs.Size.Contains(item.Value) ? "selected" : "")>@item.Text</option>
+                                                }
+                                            }
+                                        </select>
+                                    </div>
+                                </div>
+                            }
+                         }
+                    </div>
+                    <button id="color_@(((ViewBag.ColorSize as List<CreateColorModel>).Count - 1).ToString())_button" class="btn btn-primary button_0" type="button" onclick="addColorSize(this)"><i class="fas fa-plus-circle mr-1"></i>Thêm màu</button>
+                    <button class="btn btn-warning" type="button" onclick="resetColorSize()"><i class="fas fa-rotate-left mr-1"></i>Đặt lại</button>
+                </div>
+               
+            </div>
+        </div>
+        <div class="tab-pane fade" id="product-edit-description">
+            <div class="card">
+                <div class="card-body">
+                    @Html.TextAreaFor(m => m.Description, new {@class="summernote" })
+                  @*<textarea class="summernote" name="Description"></textarea>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+    <script src="~/Content/Adminassets/summernote/summernote-bs4.js"></script>
+
+    <script>
+        function addColorSize(button) {
+            // Chia chuỗi bằng dấu `_`
+            var parts = button.id.split('_');
+
+            //lấy element
+            var selectColor = document.getElementById('color_' + parseInt(parts[1], 10));
+            var selectSize = document.getElementById('color_' + parseInt(parts[1], 10) + '_size');
+            // lấy giá trị
+            var selectedColors = selectColor.selectedOptions;
+            var selectedSizes = selectSize.selectedOptions;
+
+            // Tạo một mảng để lưu giữ các giá trị được chọn
+            var selectedColorValues = [];
+            var selectedSizeValues = [];
+
+            // Lặp qua các option được chọn và thêm giá trị vào mảng
+            for (var i = 0; i < selectedColors.length; i++) {
+                if (selectedColors[i].value != "") {
+                    selectedColorValues.push(selectedColors[i].value);
+                }              
+            }
+            for (var i = 0; i < selectedSizes.length; i++) {
+                selectedSizeValues.push(selectedSizes[i].value);
+            }
+            if (selectedColorValues.length == 0) {
+                displayMessage('Màu hiện tại chưa được chọn', '', 'error');
+            } else if (selectedSizeValues.length == 0) {
+                displayMessage(`Kích cỡ của màu ${selectedColors[0].text} chưa được chọn`, '', 'error');
+            } else {
+                // Lấy phần tử thứ 2 và chuyển thành số, sau đó cộng thêm 1
+                var nextColor = parseInt(parts[1], 10) + 1;
+                // Gán giá trị mới cho id của nút
+                button.id = "color_" + nextColor + "_button";
+                // Gửi giá trị đến server, ví dụ sử dụng ajax
+                $.ajax({
+                    url: '/Admin/Product/AddColorSize',
+                    type: 'POST',
+                    data: {
+                        nextColor: nextColor
+                    },
+                    success: function (result) {
+                        $("#color_size_container").append(result);
+                    },
+                    error: function (error) {
+                        console.error(error);
+                    }
+                });
+            }
+            
+        }
+        function resetColorSize() {
+            $.ajax({
+                url: '/Admin/Product/ResetColorSize',
+                type: 'POST',
+                data: {},
+                success: function (result) {
+                    // gán lại id cho button thêm
+                    $(".button_0").attr("id", "color_0_button");
+                    $("#color_size_container").html(result);
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        }
+        function onSelectedColor(color, index) {
+            // lấy giá trị
+            var selectedColors = color.selectedOptions;
+
+            // Tạo một mảng để lưu giữ các giá trị được chọn
+            var selectedColorValues = [];
+
+            // Lặp qua các option được chọn và thêm giá trị vào mảng
+            for (var i = 0; i < selectedColors.length; i++) {
+                selectedColorValues.push(selectedColors[i].value);
+            }
+            color.style.color = 'black';
+            color.style.opacity = "1";
+            $.ajax({
+                url: '/Admin/Product/UpdateColor',
+                type: 'POST',
+                data: {
+                    colorId: selectedColorValues[0],
+                    index: index
+                },
+                success: function (result) {
+                    if (result.colorOld != "") {
+                        if (result.colorOld == "undefined") {
+                            var optionToSelect = $(color).find('option[value=""]');
+
+                            // Check if the option was found
+                            if (optionToSelect.length > 0) {
+                                // Set the selected attribute for the found option
+                                optionToSelect.prop('selected', true);
+                            } else {
+                                console.error('Option with value ' + result.colorOld + ' not found.');
+                            }
+                        }
+                        else {
+                            // Find the option with value equal to colorOld
+                            var optionToSelect = $(color).find('option[value="' + result.colorOld + '"]');
+
+                            // Check if the option was found
+                            if (optionToSelect.length > 0) {
+                                // Set the selected attribute for the found option
+                                optionToSelect.prop('selected', true);
+                            } else {
+                                console.error('Option with value ' + result.colorOld + ' not found.');
+                            }
+                        }
+                        displayMessage('Màu đã tồn tại', '', 'error');
+                    } else {
+                        color.style.backgroundColor = selectedColors[0].style.backgroundColor;
+                    }
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        }
+        function onSelectedSize(size, index) {
+            // lấy giá trị
+            var selectedSizes = size.selectedOptions;
+
+            // Tạo một mảng để lưu giữ các giá trị được chọn
+            var selectedSizeValues = [];
+            for (var i = 0; i < selectedSizes.length; i++) {
+                selectedSizeValues.push(selectedSizes[i].value);
+            }
+            $.ajax({
+                url: '/Admin/Product/UpdateSize',
+                type: 'POST',
+                data: {
+                    sizes: selectedSizeValues,
+                    index: index
+                },
+                success: function (result) {
+                    
+                },
+                error: function (error) {
+                    console.error(error);
+                }
+            });
+        }
+        function changePreImage(input) {
+            var preview = document.getElementById('previewImage');
+
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        };
+        jQuery(document).ready(function () {
+            $('.summernote').summernote({
+                fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New'],
+                styleTags: ['p', 'h1', 'h2', 'h3', 'h4', 'h5'],
+                height: 200,
+                minHeight: null,
+                maxHeight: null,
+                focus: true
+            });
+        });
+    </script>
+}

@@ -1,0 +1,467 @@
+﻿@using FashionShop.Models
+@using PagedList.Mvc
+@model PagedList.IPagedList<FashionShop.Models.Order>
+@{
+    int CurrentPage = ViewBag.CurrentPage;
+    ViewData["Title"] = "Lịch sử thanh toán";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<div class="page-header">
+    <div class="header-sub-title">
+        <nav class="breadcrumb breadcrumb-dash">
+            <a href="@Url.Action("Index","Dashboard")" class="breadcrumb-item"><i class="fa-solid fa-house mr-1"></i>Trang chủ</a>
+            <a asp-action="Index" class="breadcrumb-item">Đơn hàng</a>
+            <span class="breadcrumb-item active">Lịch sử thanh toán trang: @CurrentPage</span>
+        </nav>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="input-affix m-v-10">
+                            <i class="prefix-icon anticon anticon-search opacity-04"></i>
+                            <input id="keyword" name="keyword" type="text" class="form-control" placeholder="Tìm kiếm">
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="col-md-6 text-right m-v-10">
+                <a class="btn btn-danger" asp-controller="Order" asp-action="History"><span>Lịch sử thanh toán</span></a>
+            </div>
+        </div>
+        <div class="table-responsive table-hover">
+           <table class="table align-middle mb-0 bg-white">
+            <thead class="bg-light">
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Khách hàng</th>
+                    <th>Người thực hiện</th>
+                    <th>Thanh toán</th>
+                    <th>Tổng tiền</th>
+                    <th>Trang thái</th>
+                    <th class="text-center" style="min-width:210px">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                    @{
+                        foreach (var item in Model)
+                        {
+                                        <input type="hidden" id="name-@item.Id" name="name-@item.Id" value="@item.Name" />
+                                        <input type="hidden" id="phone-@item.Id" name="phone-@item.Id" value="@item.Phone" />
+                                        <input type="hidden" id="address-@item.Id" name="address-@item.Id" value="@item.Address" />
+                                        <input type="hidden" id="discount-@item.Id" name="discount-@item.Id" value="@(item.Discount != null ? Convert.ToInt32(item.Discount) : 0)" />
+                                        <input type="hidden" id="total-@item.Id" name="total-@item.Id" value="@(item.Total != null ? item.Total?.ToString("n0") : 0) VNĐ" />
+                                        <input type="hidden" id="payway-@item.Id" name="payway-@item.Id" value="@(item.PayWay == FashionShop.Shared.PayConst.ONLINE ? "MoMo" : "Thanh toán khi nhận hàng")" />
+                                        <input type="hidden" id="paystatus-@item.Id" name="paystatus-@item.Id" value="@(item.PayStatus == FashionShop.Shared.PayStatusConst.DONE ? "Đã thanh toán" : "Chưa thanh toán")" />
+                                        <input type="hidden" id="createat-@item.Id" name="createat-@item.Id" value="@item.CreatedAt" />
+                                        <input type="hidden" id="shipdate-@item.Id" name="shipdate-@item.Id" value="@(item.ShipDate == null ? "Chưa giao hàng" : item.ShipDate)" />
+                                        <input type="hidden" id="receivedate-@item.Id" name="receivedate-@item.Id" value="@(item.ReceiveDate == null ? "Chưa nhận hàng" : item.ReceiveDate)" />
+                                        <input type="hidden" id="status-@item.Id" name="status-@item.Id" value="@item.Status" />
+                                        <tr>
+                                            <td>
+                                                   <a href="@Url.Action("Details", new { @id = item.Id })" class="mb-1" style="font-size:2.5em;" title="Xem chi tiết">
+                                                        <span class="badge badge-primary rounded-pill d-inline">
+                                                            @item.OrderDetails.Count
+                                                        </span>
+                                                   </a>
+                                            </td>
+                                            <td onclick="ShowCustomer()" style="cursor:pointer">
+                                                <p class="mb-1 text-nowrap font-weight-bold">Tên: @item.Name</p>
+                                                <p class="mb-0 text-nowrap">Số Điện Thoại: @item.Phone</p>
+                                            </td>
+                                            <td onclick="ShowUser()" style="cursor:pointer">
+                                                <p class="mb-1 text-nowrap">Tên: @item.Account.Name</p>
+                                                <p class="mb-0 text-muted">ID: @item.Account.Id</p>
+                                            </td>
+                                            <td>
+                                    @{
+                                        if (@item.PayWay == FashionShop.Shared.PayConst.ONLINE)
+                                        {
+                                                                        <p class="mb-1"><span class="badge badge-warning rounded-pill d-inline">@item.PayWay</span></p>
+                                        }
+                                        else if (@item.PayWay == FashionShop.Shared.PayConst.OFFLINE)
+                                        {
+                                                                        <p class="mb-1"><span class="badge badge-info rounded-pill d-inline">@item.PayWay</span></p>
+                                        }
+                                        if (@item.PayStatus == FashionShop.Shared.PayStatusConst.DONE)
+                                        {
+                                                                         <p class="mb-0"><span class="badge badge-success rounded-pill d-inline">Đã thanh toán</span></p>
+                                        }
+                                        else if (@item.PayStatus == FashionShop.Shared.PayStatusConst.NODONE)
+                                        {
+                                                                         <p class="mb-0"><span class="badge badge-danger rounded-pill d-inline">Chưa thanh toán</span></p>
+                                        }
+                                    }
+                                            </td>
+
+                                             <td class="text-nowrap">
+                                                    <p class="mb-1 text-nowrap">@((item.Total)?.ToString("n0")) VNĐ</p>
+                                                    <p class="mb-0 text-muted text-nowrap">Giảm giá: @(item.Discount != 0 ? (item.Discount?.ToString("n0") + " VNĐ") : "Không")</p>
+                                             </td>
+                                            <td>
+                                                 <p class="mb-1"><span class="badge badge-success rounded-pill d-inline">Thành công</span></p>
+                                            </td>
+
+                                                <td class="text-center">
+                                    @{
+                                        if (Session[Const.ROLE].ToString() == Const.ADMIN.ToString())
+                                        {
+                                             <button data-orderid="@item.Id" class="btn btn-sm btn-primary px-2 edit">
+                                                 <i class="fa fa-solid fa-pen-to-square"></i>
+                                             </button>
+                                        }
+                                    }                            
+                                                <button data-orderid="@item.Id" class="btn btn-sm btn-info px-2 detail">
+                                                    <i class="fa fa-solid fa-circle-info"></i>
+                                                </button>
+                                    @{
+                                        if (Session[Const.ROLE].ToString() == Const.ADMIN.ToString())
+                                        {
+                                                   <button data-orderid="@item.Id" class="btn btn-sm btn-danger px-2 delete">
+                                                          <i class="fa-solid fa-trash mr-1"></i>Xóa
+                                                   </button>
+                                        }
+                                    }    
+                                                   
+
+                                            </td>
+                                        </tr>
+                        }
+
+
+                    }
+
+
+            </tbody>
+        </table>
+            <div aria-label="Page navigation example">
+                <ul class="pagination">
+                    <pager class="pager-container" list="@Model" asp-area="Admin" asp-controller="History" asp-route-accid="@ViewBag.CurrentAccId" asp-action="Index" />
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal edit -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" action="@Url.Action("Edit")">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Cập nhật đơn hàng</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-width:none !important;">
+                    <input id="editid" type="hidden" class="form-control" required name="id" />
+                    <input id="edittotal" type="hidden" class="form-control"  name="total" />
+                    <div class="form-group nameorder">
+                        <label>Tên người nhận</label>
+                        <input id="editname" type="text" class="form-control" required name="name" />
+                    </div>
+                    <div class="form-group">
+                        <label>Số điện thoại</label>
+                        <input id="editphone" type="tel" class="form-control" required pattern="[0-9]{10}" name="phone" />
+                    </div>
+                    <div class="form-group">
+                        <label>Địa chỉ</label>
+                        <input id="editaddress" type="text" class="form-control" required name="address" />
+                    </div>
+                    <div class="form-group">
+                        <label>Giảm giá</label>
+                        <input id="editdiscount" type="text" pattern="\d*" class="form-control" name="discount" />
+                    </div>
+                    <div class="form-group">
+                        <label>Trạng thái</label>
+                        <select id="editstatus" name="status" class="custom-select form-control" style="min-width: 200px;" asp-items="ViewBag.StatusList">
+                               <option value="" disabled>Chọn trạng thái</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <input type="submit" class="btn btn-primary" id="submitbutton" value="Xác nhận">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal detail -->
+<div class="modal fade" id="detailModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form>
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Cập nhật đơn hàng</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-width:none !important;">
+                    <input id="detailid" type="hidden" class="form-control" required name="id" />
+                    <input id="edittotal" type="hidden" class="form-control"  name="total" />
+                    <div class="form-group nameorder">
+                        <label>Tên người nhận</label>
+                        <input id="detailname" type="text" class="form-control" readonly name="name" />
+                    </div>
+                    <div class="form-group">
+                        <label>Số điện thoại</label>
+                        <input id="detailphone" type="text" class="form-control" readonly name="phone" />
+                    </div>
+                    <div class="form-group">
+                        <label>Địa chỉ</label>
+                        <input id="detailaddress" type="text" class="form-control" readonly name="address" />
+                    </div>
+                    <div class="form-group">
+                        <label>Giảm giá</label>
+                        <input id="detaildiscount" type="text" readonly class="form-control" name="discount" />
+                    </div>
+                     <div class="form-group">
+                        <label>Hình thức thanh toán</label>
+                        <input id="detailpayway" type="text" class="form-control" readonly name="payway" />
+                    </div>
+                    <div class="form-group">
+                        <label>Trạng thái thanh toán</label>
+                        <input id="detailpaystatus" type="text" readonly class="form-control" name="paystatus" />
+                    </div>
+                    <div class="form-group">
+                        <label>Ngày đặt hàng</label>
+                        <input id="detailcreateat" type="text" readonly class="form-control" name="createat" />
+                    </div>
+                    <div class="form-group">
+                        <label>Ngày giao hàng</label>
+                        <input id="detailshipdate" type="text" readonly class="form-control" name="shipdate" />
+                    </div>
+                    <div class="form-group">
+                        <label>Ngày nhận hàng</label>
+                        <input id="detailreceivedate" type="text" readonly class="form-control" name="receivedate" />
+                    </div>
+                    <div class="form-group">
+                        <label>Tổng tiền</label>
+                        <input id="detailtotal" type="text" readonly class="form-control" name="total" />
+                    </div>
+                    <div class="form-group">
+                        <label>Trạng thái đơn hàng</label>
+                        <select id="detailstatus" name="status" disabled class="form-control" style="min-width: 200px;" asp-items="ViewBag.StatusList">
+                               <option value="" disabled>Chọn trạng thái</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal delete-->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:10000 !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content text-center">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Xóa đơn hàng</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Bạn chắc chắn xóa đơn hàng này?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                <form method="post" action="@Url.Action("Delete")">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="deleteid" name="id" />
+                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal bill-->
+<div class="modal fade" id="billModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:10000 !important">
+     <div class="modal-dialog modal-lg" id="bill-modal" role="document">
+         <!-- Partial bill-->
+    </div>
+</div>
+
+@section Styles{
+                <link href="~/css/bill.css" rel="stylesheet"/>
+                <style type="text/css" media="print">
+                    html, body {
+                        margin:0;
+                        padding:10px;
+                    }
+                    .modal{
+                        display:none;
+                    }
+                </style>
+}
+@section Scripts{
+            <script>
+                    function printBill() {
+                            var restorepage = $('body').html();
+                            var printcontent = $('#bill-print').clone();
+                            var enteredtext = $('#text').val();
+                            $('body').empty().html(printcontent);
+                            window.print();
+                            $('body').html(restorepage);
+                            $('#text').html(enteredtext);
+                            window.location.reload();
+                    };
+                $(document).ready(function () {
+
+                        //edit
+                        $(".edit").click(function (event) {
+                            var orderid = $(this).attr("data-orderid");
+                            var name = $("#name-" + orderid).val();
+                            var phone = $("#phone-" + orderid).val();
+                            var address = $("#address-" + orderid).val();
+                            var discount = $("#discount-" + orderid).val();
+                            var total = $("#total-" + orderid).val();
+                            var status = $("#status-" + orderid).val();
+
+                            $("#editid").val(orderid);
+                            $("#editname").val(name);
+                            $("#editphone").val(phone);
+                            $("#editaddress").val(address);
+                            $("#editdiscount").val(discount);
+                            $("#edittotal").val(total);
+                            $("#editstatus").val(status);
+                            //submit
+                            document.getElementById("submitbutton").type = "submit";
+                            $("#editModal").modal();
+                        });
+                    //detail
+                        $(".detail").click(function (event) {
+                            var orderid = $(this).attr("data-orderid");
+                            var name = $("#name-" + orderid).val();
+                            var phone = $("#phone-" + orderid).val();
+                            var address = $("#address-" + orderid).val();
+                            var discount = $("#discount-" + orderid).val();
+                            var payway = $("#payway-" + orderid).val();
+                            var paystatus = $("#paystatus-" + orderid).val();
+                            var createat = $("#createat-" + orderid).val();
+                            var shipdate = $("#shipdate-" + orderid).val();
+                            var receivedate = $("#receivedate-" + orderid).val();
+                            var total = $("#total-" + orderid).val();
+                            var status = $("#status-" + orderid).val();
+
+                            $("#detailid").val(orderid);
+                            $("#detailname").val(name);
+                            $("#detailphone").val(phone);
+                            $("#detailaddress").val(address);
+                            $("#detaildiscount").val(discount);
+                            $("#detailpayway").val(payway);
+                            $("#detailpaystatus").val(paystatus);
+                            $("#detailcreateat").val(createat);
+                            $("#detailshipdate").val(shipdate);
+                            $("#detailreceivedate").val(receivedate);
+                            $("#detailtotal").val(total);
+                            $("#detailstatus").val(status);
+
+                            //modal
+                            $("#detailModal").modal();
+                        });
+                         // delete
+                            $(".delete").click(function (event) {
+                                var deleteid = $(this).attr("data-orderid");
+                                $("#deleteid").val(deleteid);
+                                $("#deleteModal").modal();
+                            });
+                         // bill
+                            $(".bill").click(function (event) {
+                                var billid = $(this).attr("data-orderid");
+                            $.ajax({
+                                url: "@Url.Action("GetBill")",
+                                type: "POST",
+                                data: { id: billid },
+                                success: function (results) {
+                                    $("#bill-modal").html("");
+                                    $("#bill-modal").html(results);
+                                    $("#billModal").modal();
+                                },
+                                error: function (results) {
+                                    alert(results.responseText);
+                                }
+                            });
+
+                            });
+                            ///////
+                    jQuery("#txtCatID").change(function () {
+                        var Id = jQuery(this).children(":selected").attr("value");
+                        Id = parseFloat(Id);
+                        $('#txtCatID option')
+                            .removeAttr('selected');
+                        $("#txtCatID > [value=" + Id + "]").attr("selected", "true");
+                        $.ajax({
+                            url: '/Book/Filtter',
+                            datatype: "json",
+                            type: "GET",
+                            data: {
+                                CatID: Id
+                            },
+                            async: true,
+                            success: function (results) {
+                                if (results.status == "success") {
+                                    window.location.href = results.redirectUrl;
+                                }
+                            },
+                            error: function (xhr) {
+                                alert('error');
+                            }
+                        });
+                    });
+                    jQuery("#txtIDXB").change(function () {
+                        var Id = jQuery(this).children(":selected").attr("value");
+                        Id = parseFloat(Id);
+                        $('#txtIDXB option')
+                            .removeAttr('selected');
+                        $("#txtIDXB > [value=" + Id + "]").attr("selected", "true");
+                        $.ajax({
+                            url: '/Book/Filtter',
+                            datatype: "json",
+                            type: "GET",
+                            data: {
+                                CatID: Id
+                            },
+                            async: true,
+                            success: function (results) {
+                                if (results.status == "success") {
+                                    window.location.href = results.redirectUrl;
+                                }
+                            },
+                            error: function (xhr) {
+                                alert('error');
+                            }
+                        });
+                    });
+                    $("#keyword").keyup(function () {
+                        var strkeyword = $('#keyword').val();
+                        $.ajax({
+                            url: '/Search/FindBanHang/',
+                            datatype: "json",
+                            type: "POST",
+                            data: { keyword: strkeyword },
+                            async: true,
+                            success: function (results) {
+                                $("#records_table").html("");
+                                $("#records_table").html(results);
+                            },
+                            error: function (xhr) {
+                                alert('error');
+                            }
+                        });
+                    });
+                });
+            </script>
+    }

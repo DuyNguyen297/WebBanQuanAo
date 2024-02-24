@@ -1,0 +1,208 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+    <title>@ViewData["Title"]</title>
+
+    <!--Bootstrap 5 Style-->
+    @Styles.Render("~/Content/css5")
+    <!--Admin Style-->
+    <link href="~/Content/Adminassets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.css" rel="stylesheet">
+    <link href="~/Content/Adminassets/vendors/select2/select2.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/Content/Adminassets/css/app.min.css">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="~/Content/Adminassets/images/logo/favicon.png">
+
+    <!--Bootstrap 4 Style-->
+    @Styles.Render("~/Content/css")
+
+
+
+    @RenderSection("Styles", required: false)
+
+</head>
+<body>
+    <div>
+        <nav class="navbar navbar-expand-lg bg-dark navbar-top fixed-top" id="navbartop">
+            <div class="container nav-container text-light align-content-center">
+                <div class="w-100 d-flex justify-content-between">
+                    <div>
+                        <a class="navbar-sm-brand text-light text-decoration-none" href="#">
+                            <i class="fa-solid fa-envelope mx-2"></i>khangtran12g1@gmail.com
+                        </a>
+                        <a class="navbar-sm-brand text-light text-decoration-none" href="#">
+                            <i class="fa-solid fa-phone mx-2"></i>0967-784-511
+                        </a>
+                    </div>
+                    <div>
+                        <a class="text-light" href="#" target="_blank" rel="sponsored"><i class="fa-brands fa-square-facebook mr-2"></i></a>
+                        <a class="text-light" href="#" target="_blank"><i class="fa-brands fa-instagram mr-2"></i></a>
+                        <a class="text-light" href="#" target="_blank"><i class="fa-brands fa-twitter  mr-2"></i></a>
+                        <a class="text-light" href="#" target="_blank"><i class="fa-brands fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <nav class="navbar navbar-expand-lg navbar-menu navbar-light" id="navbarmenu">
+            <!-- Menu Partial-->
+            @{
+                Html.RenderAction("GetMenu", "Home");
+            }
+        </nav>
+
+        <div class="container-fluid container-main body-content m-t-100 px-5">
+            @RenderBody()
+        </div>
+        <hr />
+        <footer class="bg-body-tertiary text-center">
+            <!-- Grid container -->
+            <div class="container p-4 pb-0">
+                <!-- Section: Social media -->
+                <section class="mb-4">
+                    <!-- Facebook -->
+                    <a class="btn text-white btn-floating m-1"
+                       style="background-color: #3b5998;"
+                       href="#!"
+                       role="button">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+
+                    <!-- Twitter -->
+                    <a class="btn text-white btn-floating m-1"
+                       style="background-color: #55acee;"
+                       href="#!"
+                       role="button">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+
+                    <!-- Google -->
+                    <a class="btn text-white btn-floating m-1"
+                       style="background-color: #dd4b39;"
+                       href="#!"
+                       role="button">
+                        <i class="fab fa-google"></i>
+                    </a>
+
+                    <!-- Instagram -->
+                    <a class="btn text-white btn-floating m-1"
+                       style="background-color: #ac2bac;"
+                       href="#!"
+                       role="button">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+
+                    <!-- Linkedin -->
+                    <a class="btn text-white btn-floating m-1"
+                       style="background-color: #0082ca;"
+                       href="#!"
+                       role="button">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <!-- Github -->
+                    <a class="btn text-white btn-floating m-1"
+                       style="background-color: #333333;"
+                       href="#!"
+                       role="button">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </section>
+                <!-- Section: Social media -->
+            </div>
+            <!-- Grid container -->
+            <!-- Copyright -->
+            <div class="text-center text-light p-3" style="background-color: #000;">
+                © 2023 Copyright:
+                <a class="text-light" href="#">Shiba9duoi</a>
+            </div>
+            <!-- Copyright -->
+        </footer>
+    </div>
+    <input type="hidden" id="success" value="@TempData["success"]" />
+    <input type="hidden" id="info" value="@TempData["info"]" />
+    <input type="hidden" id="warning" value="@TempData["warning"]" />
+    <input type="hidden" id="error" value="@TempData["error"]" />
+    <input type="hidden" id="subsuccess" value="@TempData["subsuccess"]" />
+    <input type="hidden" id="subinfo" value="@TempData["subinfo"]" />
+    <input type="hidden" id="subwarning" value="@TempData["subwarning"]" />
+    <input type="hidden" id="suberror" value="@TempData["suberror"]" />
+    <!-- Scripts -->
+    <!-- Core Vendors JS -->
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/modernizr")
+    @Scripts.Render("~/bundles/toastr")
+    <script src="~/Content/Adminassets/js/vendors.min.js"></script>
+    <!-- page js -->
+
+    <script src="~/Content/lib/vue/vue.global.min.js"></script>
+
+    <script src="~/Content/Adminassets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.js"></script>
+    <script src="~/Content/Adminassets/vendors/select2/select2.min.js"></script>
+    <!-- Core JS -->
+    <script src="~/Content/Adminassets/js/app.min.js"></script>
+
+
+    <script>
+        var prevScrollpos = window.pageYOffset;
+        window.onscroll = function () {
+            var currentScrollPos = window.pageYOffset;
+            if (prevScrollpos > currentScrollPos) {
+                document.getElementById("navbartop").style.top = "0";
+                document.getElementById("navbarmenu").style.top = "35px";
+            } else {
+                document.getElementById("navbartop").style.top = "-35px";
+                document.getElementById("navbarmenu").style.top = "0";
+            }
+            prevScrollpos = currentScrollPos;
+        }
+        $(document).ready(function () {
+            $('.select2').select2();
+            $('.datepicker-input').datepicker();
+            toastr.options = {
+                "closeButton": true
+            };
+            $('.carousel').carousel({
+                interval: 3000
+            });
+        });
+        $(function () {
+            if ($('#success').val()) {
+                displayMessage($('#success').val(), $('#subsuccess').val(), 'success');
+            }
+            if ($('#info').val()) {
+                displayMessage($('#info').val(), $('#subinfo').val(), 'info');
+            }
+            if ($('#warning').val()) {
+                displayMessage($('#warning').val(), $('#subwarning').val(), 'warning');
+            }
+            if ($('#error').val()) {
+                displayMessage($('#error').val(), $('#suberror').val(), 'error');
+            }
+        });
+        var displayMessage = function (title, subTitle, msgType) {
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "positionClass": "toast-top-right",
+                "onClick": null,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "8000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+            toastr[msgType](subTitle, title);
+        };
+    </script>
+    @RenderSection("Scripts", required: false)
+</body>
+
+</html>
+@* $("#navbarmenu").load('@Url.Action("GetMenu","Home")');*@

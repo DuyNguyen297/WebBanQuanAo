@@ -1,0 +1,56 @@
+﻿@model FashionShop.Models.Branch
+
+@{
+    ViewData["Title"] = "Xóa thương hiệu";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<div class="card">
+    <div class="card-body">
+ <!-- Main content -->
+        <section class="content my-2">
+            <form action="@Url.Action("Delete", new {id = Model.Id})" method="post">
+                <div class="page-header">
+                    <div class="header-sub-title">
+                        <nav class="breadcrumb breadcrumb-dash">
+                            <a href="@Url.Action("Index","Dashboard")" class="breadcrumb-item"><i class="fa-solid fa-house mr-1"></i>Trang chủ</a>
+                            <a href="@Url.Action("Index","Branch")" class="breadcrumb-item">Thương hiệu </a>
+                            <span class="breadcrumb-item active">Xóa</span>
+                        </nav>
+                    </div>
+                </div>
+                <!-- Default box -->
+
+                <div class="card-header">
+                    <div class="row">
+                        <div class=" col-md-6">
+                        </div>
+                        <div class=" col-md-6 text-right">
+                            <a class=" btn btn-primary fa fa-solid fa-arrow-left" href="@Url.Action("Index")"></a>
+                            <button class=" btn btn-danger far fa-trash-alt" type="submit"></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <div class="row">
+                        <input type="hidden" value="@Model.Id" />
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-semibold" for="ShortDesc">Tên</label>
+                            <div class="form-control">@Html.DisplayFor(model => model.Name)</div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label class="font-weight-semibold" for="ShortDesc">Mã</label>
+                            <div class="form-control">@Html.DisplayFor(model => model.Code)</div>
+                        </div>
+                        <div class="form-group col-md-12">
+                            <label class="font-weight-semibold" for="ShortDesc">Mô tả</label>
+                            <div class="form-control">@Html.DisplayFor(model => model.Description)</div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card-body -->
+
+            </form>
+        </section>
+    </div>
+</div>

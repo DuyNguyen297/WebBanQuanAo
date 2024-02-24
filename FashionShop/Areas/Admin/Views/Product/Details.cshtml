@@ -1,0 +1,187 @@
+﻿@using FashionShop.AreaModels
+@using FashionShop.Models
+@using FashionShop.Shared
+@model FashionShop.AreaModels.CreateProductModel
+@{
+    ViewData["Title"] = "Chi tiết";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<div class="page-header">
+    <div class="header-sub-title">
+        <nav class="breadcrumb breadcrumb-dash">
+            <a href="@Url.Action("Index","Dashboard")" class="breadcrumb-item"><i class="fa-solid fa-house mr-1"></i>Trang chủ</a>
+            <a href="@Url.Action("Index","Product")" class="breadcrumb-item">Sản phẩm</a>
+            <span class="breadcrumb-item active">Chi tiết</span>
+        </nav>
+    </div>
+</div>
+<div class="page-header no-gutters has-tab">
+    <div class="d-md-flex m-b-15 align-items-center justify-content-between">
+        <div class="media align-items-center m-b-15">
+            <div class="avatar avatar-image rounded" style="height: 70px; width: 70px">
+                <img width="200" height="200" src="~/Assets/images/product/@Model.Image" alt="@Model.Name" />
+            </div>
+            <div class="m-l-15">
+                <h4 class="m-b-0">@Model.Name</h4>
+                <p class="text-muted m-b-0">ID: #@Model.Id</p>
+            </div>
+        </div>
+        <div class="m-b-15">
+            <a class="btn btn-success fa fa-solid fa-arrow-left" href="@Url.Action("Index","Product")"></a>
+            <a class=" btn btn-primary fas fa-edit" href="@Url.Action("Edit", "Product", new {id=@Model.Id})"> </a>
+            <a class=" btn btn-danger far fa-trash-alt" href="@Url.Action("Delete", "Product", new {id=@Model.Id})"> </a>
+        </div>
+    </div>
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#product-overview">Overview</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#product-images">Images</a>
+        </li>
+    </ul>
+</div>
+<div class="container-fluid">
+    <div class="tab-content m-t-15">
+        <div class="tab-pane fade show active" id="product-overview">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class=" col-md-6">
+                            <h4 class="card-title">Thông tin sản phẩm</h4>
+                            <div class="table-responsive">
+                                <table class="product-info-table m-t-20">
+                                    <tbody>
+                                        <tr>
+                                            <td>Tên sản phẩm</td>
+                                            <td class="text-dark font-weight-semibold">
+                                                @Model.Name
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Mã:</td>
+                                            <td class="text-dark font-weight-semibold">@Model.Code</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Giá:</td>
+                                            <td class="text-dark font-weight-semibold">@(Model.Price?.ToString("n0")) VNĐ</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Giảm giá:</td>
+                                            <td>@(Model.Discount?.ToString("n0")) VNĐ</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Mặt hàng:</td>
+                                            <td>@(Model.Category?.Name)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Thương hiệu:</td>
+                                            <td>@(Model.Branch?.Name)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Nổi bật:</td>
+                                            <td>
+                                                @if (Model.Outstanding)
+                                                {
+                                                    <span class="badge badge-success font-weight-bold">Có</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-danger font-weight-bold">Không</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Số lượng:</td>
+                                            <td>
+                                                @if (Model.Quantity > 0)
+                                                {
+                                                    <span class="badge badge-pill badge-cyan font-weight-bold">Còn hàng: @(Model.Quantity)</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-pill badge-red font-weight-bold">Hết hàng</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h4 class="card-title">Thông tin khác</h4>
+                            <div class="table-responsive">
+                                <table class="product-info-table m-t-20">
+                                    <tbody>
+                                        <tr>
+                                            <td>Ngày tạo:</td>
+                                            <td>@(Model.CreatedAt?.ToString("dd/MM/yyyy hh:mm tt"))</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Màu sắc:</td>
+                                            <td>
+                                                @foreach (var item in Model.ColorSizes)
+                                                {
+                                                    <div class="d-flex">
+                                                        @{
+                                                            <span class="d-flex align-items-center">
+                                                                @{
+                                                                    string color = (ViewBag.ColorId as List<Color>).FirstOrDefault(c => c.Id == item.Color).Code;
+                                                                    <span class="badge badge-dot product-color m-r-5" style="background-color:@color"></span>
+                                                                    <span class="font-weight-semibold">@color: </span>
+                                                                }
+                                                            </span>
+                                                            <span class="d-flex align-items-center pl-1">
+                                                                @{
+                                                                    foreach (var size in item.Size)
+                                                                    {
+                                                                        <span>@((ViewBag.SizeId as List<Size>).FirstOrDefault(s => s.Id == size).Code + (size != item.Size[item.Size.Length - 1] ? " ," : ""))</span>
+                                                                    }
+                                                                }
+                                                            </span>
+                                                        }
+                                                    </div>
+                                                }
+                                            </td>
+                                            <td>
+                                                
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Hình ảnh:</td>
+                                            <td>
+                                                <img class="rounded" height="200" style="object-fit:cover" src="~/Assets/images/product/@Model.Image" alt="@Model.Name" />
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Mô tả sản phẩm</h4>
+                </div>
+                <div class="card-body" style="font-family: 'Quicksand', sans-serif !important;">
+                    @Html.Raw(Model.Description)
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="product-images">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img class="rounded" width="350" height="350" style="object-fit:cover" src="~/Assets/images/product/@Model.Image" alt="@Model.Name" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

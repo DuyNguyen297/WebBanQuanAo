@@ -1,0 +1,36 @@
+﻿@model FashionShop.AreaModels.CreateColorModel
+<div class="row pt-2" @(Model.Index != 0 ? "style=\"border-top: 1px gray solid\"" : "")>
+    <div class="form-group col-md-6">
+        @if (Model.Index == 0)
+        {
+            <label class="font-weight-semibold" for="productColor">Màu sắc</label>
+        }
+        @*@Html.DropDownList((string)Model.Color, (SelectList)ViewBag.ColorId, new { @class = "custom-select", @style = "min-width: 200px;", @required = "required", @id = (string)(Model.Color) })*@
+        <select id="color_@(Model.Index.ToString())" class="custom-select" onchange="onSelectedColor(this, @Model.Index)" style="min-width: 200px;" required>
+            @{
+                var colorItems = (SelectList)ViewBag.ColorId;
+                <option value="">-- Chọn màu sắc --</option>
+                foreach (var item in colorItems)
+                {
+                    <option value="@item.Value" @(item.Selected ? "selected" : "") style="background-color:@item.Text.Split('_')[0]">@item.Text.Split('_')[1]</option>
+                }
+            }
+        </select>
+    </div>
+    <div class="form-group col-md-6">
+        @if (Model.Index == 0)
+        {
+            <label class="font-weight-semibold" for="productSize">Kích cỡ</label>
+        }
+        @*@Html.ListBox((string)(Model.Color + "_size"), (MultiSelectList)ViewBag.SizeId, new { @class = "custom-select", @style = "min-width: 200px;", @id = (string)(Model.Color + "_size") })*@
+        <select id="color_@(Model.Index.ToString())_size" class="custom-select" onchange="onSelectedSize(this, @Model.Index)" style="min-width: 200px;" multiple required>
+            @{
+                var sizeItems = (MultiSelectList)ViewBag.SizeId;
+                foreach (var item in sizeItems)
+                {
+                    <option value="@item.Value" @(item.Selected ? "selected" : "")>@item.Text</option>
+                }
+            }
+        </select>
+    </div>
+</div>

@@ -1,0 +1,53 @@
+﻿@model FashionShop.Models.Size
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<div class="card">
+    <div class="card-body">
+        <!-- Main content -->
+        <form action="@Url.Action("Edit", new {id = Model.Id})" method="post">
+            <div class="page-header">
+                <div class="header-sub-title">
+                    <nav class="breadcrumb breadcrumb-dash">
+                        <a href="@Url.Action("Index","Dashboard")" class="breadcrumb-item"><i class="fa-solid fa-house mr-1"></i>Trang chủ</a>
+                        <a href="@Url.Action("Index","Size")" class="breadcrumb-item">Kích cỡ</a>
+                        <span class="breadcrumb-item active">Cập nhật</span>
+                    </nav>
+                </div>
+            </div>
+            <!-- Default box -->
+
+            <div class="card-header">
+                <div class="row">
+                    <div class=" col-md-6">
+                        
+                    </div>
+                    <div class=" col-md-6 text-right">
+                         <a class=" btn btn-success fa fa-solid fa-arrow-left" href="@Url.Action("Index","Size")"></a>
+                        <button class="btn btn-primary fas fas fa-save " type="submit"></button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <input type="hidden" name="Id" value="@Model.Id"/>
+                 <div class="form-group">
+                    <label name="Name" class="control-label">Tên</label>
+                    <input name="Name" class="form-control" value="@Model.Name"/>
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label name="Code" class="control-label">Mã</label>
+                    <input name="Code" class="form-control" value="@Model.Code"/>
+                    <span asp-validation-for="Code" class="text-danger"></span>
+                </div>
+            </div>
+            <!-- /.card-body -->
+
+        </form>
+    </div>
+
+    <!-- /.content -->
+</div>

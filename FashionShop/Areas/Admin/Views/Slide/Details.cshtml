@@ -1,0 +1,78 @@
+﻿@model FashionShop.Models.Slide
+
+@{
+    ViewData["Title"] = "Chi tiết Slide";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<div class="card">
+    <div class="card-body">
+        <div class="page-header">
+            <div class="header-sub-title">
+                <nav class="breadcrumb breadcrumb-dash">
+                    <a href="@Url.Action("Index","Dashboard")" class="breadcrumb-item"><i class="fa-solid fa-house mr-1"></i>Trang chủ</a>
+                    <a href="@Url.Action("Index","Slide")" class="breadcrumb-item">Slide</a>
+                    <span class="breadcrumb-item active">Chi tiết</span>
+                </nav>
+            </div>
+        </div>
+        <!-- Default box -->
+
+        <div class="card-header">
+            <div class="row">
+                <div class=" col-md-6">
+                    
+                </div>
+                <div class=" col-md-6 text-right">
+                    <a class="btn btn-success fa fa-solid fa-arrow-left" href="@Url.Action("Index")"></a>
+                    <a class=" btn btn-primary fas fa-edit" href="@Url.Action("Edit", new {id=@Model.Id})"> </a>
+                    <a class=" btn btn-danger far fa-trash-alt" href="@Url.Action("Delete", new {id=@Model.Id})"> </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+                <div class="form-group">
+                    <label name="Name" class="control-label">Tên</label>
+                    <div class="form-control">@Html.DisplayFor(model => model.Name)</div>
+                </div>
+                <div class="form-group">
+                    <label name="Code" class="control-label">Tiêu đề</label>
+                    <div class="form-control">@Html.DisplayFor(model => model.Title)</div>
+                </div>
+                <div class="form-group">
+                    <label name="Code" class="control-label">Nội dung</label>
+                    <div class="form-control">@Html.DisplayFor(model => model.Content)</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label name="Code" class="control-label">Số thứ tự</label>
+                        <div class="form-control">@Html.DisplayFor(model => model.SeqNum)</div>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label name="Code" class="control-label">Hiện/Ẩn</label>
+                        <div class="form-control">
+                            @if (Model.IsActive)
+                            {
+                                <span class="badge badge-success font-weight-bold">Hiện</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-danger font-weight-bold">Ẩn</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 form-group">
+                        <label name="Code" class="control-label">Ngày tạo</label>
+                        <div class="form-control">@(Model.CreatedAt?.ToString("dd/MM/yyyy hh:ss tt"))</div>
+                    </div>
+                    <div class="col-md-6 form-group">
+                        <label name="Code" class="control-label">Người thực hiện</label>
+                        <div class="form-control">@(Model.Account?.Name)</div>
+                    </div>
+                </div>
+        </div>
+        <!-- /.card-body -->
+    </div>
+    <!-- /.content -->
+</div>

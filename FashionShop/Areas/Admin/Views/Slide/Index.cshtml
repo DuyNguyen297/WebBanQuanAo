@@ -1,0 +1,103 @@
+﻿@using PagedList.Mvc
+@model PagedList.IPagedList<FashionShop.Models.Slide>
+
+@{
+    int CurrentPage = ViewBag.CurrentPage;
+    ViewData["Title"] = "Danh sách Slide";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+<div class="page-header">
+    <div class="header-sub-title">
+        <nav class="breadcrumb breadcrumb-dash">
+            <a href="@Url.Action("Index","Dashboard")" class="breadcrumb-item"><i class="fa-solid fa-house mr-1"></i>Trang chủ</a>
+            <span class="breadcrumb-item active">Slide: trang @CurrentPage </span>
+        </nav>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="input-affix">
+                            <form method="get">
+                                <i class="prefix-icon anticon anticon-search opacity-04"></i>
+                                <input id="searchkey" name="searchkey" type="text" class="form-control" placeholder="Tìm kiếm Slide">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 text-right">
+                <a class="btn btn-primary" href="@Url.Action("Create")"><i class="anticon anticon-plus-circle m-r-5"></i><span>Thêm</span></a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover e-commerce-table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th class="text-center">Thông tin</th>
+                        <th class="text-center">Hình ảnh</th>
+                        <th class="text-center">Nội dung</th>
+                        <th class="text-center">Thứ tự</th>
+                        <th class="text-center">Hiện/Ẩn</th>
+                        <th scope="col" class="text-center" style="min-width: 120px;">Chức năng</th>
+                    </tr>
+                </thead>
+                <tbody id="records_table">
+                    @if (Model != null)
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="mx-3">
+                                            <p class="font-weight-bold mb-1">@item.Name</p>
+                                            <p class="font-weight-bold mb-0">Tiêu đề:<span class="font-weight-semibold"> @item.Title</span></p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td scope="row" class="text-center">
+                                    <div>
+                                        <img src="~/Assets/images/slide/@item.Image"
+                                             alt=""
+                                             style="width: 140px; height: 70px"
+                                             class="avatar avatar-image rounded" />
+                                    </div>
+                                </td>
+                                <td scope="row" class="text-center">@item.Content</td>
+                                <td scope="row" class="text-center">@item.SeqNum</td>
+                                <td scope="row" class="text-center">
+                                    @if (item.IsActive)
+                                    {
+                                        <span class="badge badge-success font-weight-bold">Hiện</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-danger font-weight-bold">Ẩn</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <a class="btn btn-icon btn-hover btn-sm btn-rounded" href="@Url.Action("Details", new {id = item.Id})"><i class="anticon anticon-info-circle"></i></a>
+                                    <a class="btn btn-icon btn-hover btn-sm btn-rounded" href="@Url.Action("Edit", new {id = item.Id})"><i class="anticon anticon-edit"></i></a>
+                                    <a class="btn btn-icon btn-hover btn-sm btn-rounded" href="@Url.Action("Delete", new {id = item.Id})"><i class="anticon anticon-delete"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    }
+
+
+                </tbody>
+            </table>
+            <div aria-label="Page navigation example" class="my-3">
+                @Html.PagedListPager(
+                    Model,
+                    page => Url.Action("Index", new { page })
+                )
+            </div>
+        </div>
+    </div>
+</div>

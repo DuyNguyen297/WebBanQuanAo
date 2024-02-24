@@ -1,0 +1,74 @@
+﻿@using FashionShop.Models;
+@using FashionShop.Shared;
+@using PagedList.Mvc;
+@model PagedList.IPagedList<FashionShop.Models.VoucherCategory>
+<div class="card">
+    <div class="card-body">
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="input-affix">
+                            <i class="prefix-icon anticon anticon-search opacity-04"></i>
+                            <input id="keyword" name="keyword" type="text" class="form-control" placeholder="Tìm kiếm voucher">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 text-right">
+                
+            </div>
+        </div>
+        <div class="table-responsive table-hover">
+            @if (Model.Count > 0)
+            {
+                <table id="table_click" class="table align-middle mb-0 bg-white">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th class="text-center">Tên</th>
+                            <th class="text-center">Thời gian bắt đầu</th>
+                            <th class="text-center">Thời gian kết thúc</th>
+                            <th class="text-center">Giá trị đơn hàng từ</th>
+                            <th class="text-center">Số tiền giảm</th>
+                            <th scope="col" class="text-center" style="min-width: 120px;">Chức năng</th>
+                        </tr>
+                    </thead>
+                    <tbody id="records_table">
+                        @if (Model != null)
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td scope="row" class="text-center">@item.Name</td>
+                                    <td scope="row" class="text-center">@(item.StartDate?.ToString("dd/MM/yyyy hh:ss tt"))</td>
+                                    <td scope="row" class="text-center">@(item.EndDate?.ToString("dd/MM/yyyy hh:ss tt"))</td>
+                                    <td scope="row">@(item.TotalCondition?.ToString("n0"))</td>
+                                    <td scope="row">@(item.Discount?.ToString("n0"))</td>
+                                    <td class="text-center">
+                                        <a class="btn btn-icon btn-hover btn-sm btn-rounded" href="@Url.Action("Details", new {id = item.Id})"><i class="anticon anticon-info-circle"></i></a>
+                                        <a class="btn btn-icon btn-hover btn-sm btn-rounded" href="@Url.Action("Edit", new {id = item.Id})"><i class="anticon anticon-edit"></i></a>
+                                        <a class="btn btn-icon btn-hover btn-sm btn-rounded" href="@Url.Action("Delete", new {id = item.Id})"><i class="anticon anticon-delete"></i></a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+
+
+                    </tbody>
+                </table>
+                <div aria-label="Page navigation example" class="my-3">
+                    @Html.PagedListPager(
+                        Model,
+                        page => Url.Action("Index", new { page })
+                    )
+                </div>
+            }
+            else
+            {
+                <div class="text-muted font-italic">
+                    Không có voucher nào
+                </div>
+            }
+        </div>
+    </div>
+</div>

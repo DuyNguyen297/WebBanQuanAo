@@ -1,0 +1,464 @@
+﻿@using FashionShop.Models;
+@using FashionShop.Shared;
+@using PagedList.Mvc;
+@model PagedList.IPagedList<FashionShop.Models.Order>
+@{
+    int CurrentPage = ViewBag.CurrentPage;
+    ViewData["Title"] = "Xử lý Đơn hàng";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+@section Styles{
+    <link href="~/Content/css/bill.css" rel="stylesheet" />
+    <style type="text/css" media="print">
+        html, body {
+            margin: 0;
+            padding: 10px;
+        }
+
+        .modal {
+            display: none;
+        }
+    </style>
+}
+<div class="page-header">
+    <div class="header-sub-title">
+        <nav class="breadcrumb breadcrumb-dash">
+            <a href="@Url.Action("Index","Dashboard")" class="breadcrumb-item"><i class="fa-solid fa-house mr-1"></i>Trang chủ</a>
+            <span class="breadcrumb-item active">Đơn hàng : trang @CurrentPage</span>
+        </nav>
+    </div>
+</div>
+<div class="page-header no-gutters has-tab">
+    <div class="d-md-flex m-b-15 align-items-center justify-content-between">
+        <div class="col-md-6">
+        </div>
+        <div class="col-md-6 text-right">
+            <div class="text-right">
+                <button class="btn btn-warning" type="submit"><i class="fas fa-history mr-1"></i>Lịch sử thanh toán</button>
+            </div>
+        </div>
+    </div>
+    <ul class="nav nav-tabs">
+        @foreach (var item in ViewBag.StatusList as Dictionary<string, string>)
+        {
+            <li class="nav-item">
+                <a class="nav-link bg-transparent w-100 avatar avatar-badge avatar-square @(ViewBag.Active == item.Key ? "active" : "")" data-toggle="tab" href="#@(item.Key)">
+                    @((ViewBag.StatusListSelection as SelectList).FirstOrDefault(s => s.Value == item.Key)?.Text)
+                    @if (Model.Where(o => o.Status == item.Key)?.Count() > 0)
+                    {
+                        <span class="badge badge-indicator badge-danger font-weight-bold mr-2">@(Model.Where(o => o.Status == item.Key)?.Count())</span>
+                    }
+                </a>
+            </li>
+        }
+    </ul>
+</div>
+<div class="tab-content m-t-15">
+    @foreach(var item in ViewBag.StatusList as Dictionary<string, string>)
+    {
+        var modelFilter = Model.Where(o => o.Status == item.Key).ToList();
+        var pageNumberFilter = 1; // Set the page number
+        var pageSizeFilter = 8;
+        var pagedModelFilter = new PagedList.PagedList<FashionShop.Models.Order>(modelFilter, pageNumberFilter, pageSizeFilter);
+        <div class="tab-pane fade @(ViewBag.Active == item.Key ? "show active" : "")" id="@item.Key">
+            @Html.Partial("_StatusPartial", pagedModelFilter)
+        </div>
+    }
+</div>
+<!-- Modal edit order -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form action="@Url.Action("Edit")" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Cập nhật đơn hàng</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-width:none !important;">
+                    <input id="editid" type="hidden" class="form-control" required name="id" />
+                    <input id="editcode" type="hidden" class="form-control" required name="code" />
+                    <div class="form-group">
+                        <label>Tên người nhận</label>
+                        <input id="editname" type="text" class="form-control" required name="name" />
+                    </div>
+                    <div class="form-group">
+                        <label>Số điện thoại</label>
+                        <input id="editphone" type="tel" class="form-control" required pattern="[0-9]{10}" name="phone" />
+                    </div>
+                    <div class="form-group">
+                        <label>Địa chỉ</label>
+                        <input id="editaddress" type="text" class="form-control" required name="address" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Thoát</button>
+                    <button type="submit" class="btn btn-primary" id="submitEditButton">Xác nhận</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal import order -->
+<div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:10000 !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" action="@Url.Action("Import")">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Cập nhật sản phẩm</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn chắc chắn hoàn tiền nếu đã thanh toán và cập nhật lại các sản phẩm có trong đơn hàng?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Hủy</button>
+                    <input type="hidden" id="importid" name="id" />
+                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal resetup order -->
+<div class="modal fade" id="resetupModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:10000 !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content text-center">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Chuẩn bị lại đơn hàng</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Bạn chắc chắn chuyển đơn hàng sang trạng thái chờ lấy hàng?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Hủy</button>
+                <form method="post" action="@Url.Action("ReSetup")">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="resetupid" name="id" />
+                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal reject order -->
+<div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:10000 !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content text-center">
+            <form action="@Url.Action("Reject")" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Trả hàng</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-light badge-cyan rounded-pill" id="option1">
+                            <input type="radio" name="reason" value="Yêu cầu từ khách hàng"> Yêu cầu từ khách hàng
+                        </label>
+                        <label class="btn btn-light badge-cyan rounded-pill" id="option2">
+                            <input type="radio" name="reason" value="Giao hàng không thành công"> Giao hàng không thành công
+                        </label>
+                        <label class="btn btn-light badge-cyan rounded-pill" id="option4">
+                            <input type="radio" name="reason" value="@FashionShop.Shared.Const.REFUSEREASON"> Lý do khác
+                        </label>
+                    </div>
+                    <div class="form-group collapse mt-3" id="myCollapse">
+                        <input id="refusereason" type="text" class="form-control" name="refusereason" placeholder="Nhập lý do..." />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Thoát</button>
+                    <input type="hidden" id="rejectid" name="id" />
+                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal return order -->
+<div class="modal fade" id="returnModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:10000 !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content text-center">
+            <form action="@Url.Action("Return")" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Trả hàng</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-light badge-cyan rounded-pill" id="option1">
+                            <input type="radio" name="reason" value="Muốn đổi sản phẩm khác"> Muốn đổi sản phẩm khác
+                        </label>
+                        <label class="btn btn-light badge-cyan rounded-pill" id="option2">
+                            <input type="radio" name="reason" value="Sản phẩm không đạt yêu cầu"> Sản phẩm không đạt yêu cầu
+                        </label>
+                        <label class="btn btn-light badge-cyan rounded-pill" id="option4">
+                            <input type="radio" name="reason" value="@FashionShop.Shared.Const.REFUSEREASON"> Lý do khác
+                        </label>
+                    </div>
+                    <div class="form-group collapse mt-3" id="myCollapse">
+                        <input id="refusereason" type="text" class="form-control" name="refusereason" placeholder="Nhập lý do..." />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Thoát</button>
+                    <input type="hidden" id="returnid" name="id" />
+                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal cancel order -->
+<div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:10000 !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content text-center">
+            <form action="@Url.Action("Cancel")" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Hủy đơn hàng</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                        <label class="btn btn-light badge-cyan rounded-pill" id="option1">
+                            <input type="radio" name="reason" value="Muốn đổi sản phẩm khác"> Muốn đổi sản phẩm khác
+                        </label>
+                        <label class="btn btn-light badge-cyan rounded-pill" id="option2">
+                            <input type="radio" name="reason" value="Không còn nhu cầu nữa"> Không còn nhu cầu nữa
+                        </label>
+                        <label class="btn btn-light badge-cyan rounded-pill" id="option3">
+                            <input type="radio" name="reason" value="Yêu cầu khách hàng"> Yêu cầu khách hàng
+                        </label>
+                        <label class="btn btn-light badge-cyan rounded-pill" id="option4">
+                            <input type="radio" name="reason" value="@FashionShop.Shared.Const.REFUSEREASON"> Lý do khác
+                        </label>
+                    </div>
+                    <div class="form-group collapse mt-3" id="myCollapse">
+                        <input id="refusereason" type="text" class="form-control" name="refusereason" placeholder="Nhập lý do..." />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Thoát</button>
+                    <input type="hidden" id="cancelid" name="id" />
+                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Modal delete order -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:10000 !important">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content text-center">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Xóa đơn hàng</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn chắc chắn xóa đơn hàng này?</p>
+                <p>Các sản phẩm sẽ không được cập nhật nếu bạn chưa thao tác cập nhật sản phẩm?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Hủy</button>
+                <form method="post" action="@Url.Action("Delete")">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="deleteid" name="id" />
+                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal bill-->
+<div class="modal fade" id="billModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" style="z-index:10000 !important">
+    <div class="modal-dialog modal-lg" id="bill-modal" role="document">
+        <!-- Partial bill-->
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        function printBill() {
+             var restorepage = $('body').html();
+             var printcontent = $('#bill-print').clone();
+             var enteredtext = $('#text').val();
+             $('body').empty().html(printcontent);
+             window.print();
+             $('body').html(restorepage);
+             $('#text').html(enteredtext);
+             window.location.reload();
+        };
+        function GetBill(button) {
+            var id = button.id;
+             $.ajax({
+                 url: "@Url.Action("GetBillById")",
+                 data: {
+                     id:id
+                 },
+                  type: "POST",
+                  success: function (results) {
+                      if (results.error) {
+                          displayMessage(result.message, '', 'error');
+                      } else {
+                          $("#bill-modal").html("");
+                          $("#bill-modal").html(results);
+                          $("#billModal").modal();
+                      }
+                  },
+                  error: function (results) {
+                      alert(results.responseText);
+                  }
+              });
+        }
+
+        //// edit
+        function editOrder(id) {
+            var code = $("#code-" + id).val();
+            var name = $("#name-" + id).val();
+            var phone = $("#phone-" + id).val();
+            var address = $("#address-" + id).val();
+
+            $("#editid").val(id);
+            $("#editcode").val(code);
+            $("#editname").val(name);
+            $("#editphone").val(phone);
+            $("#editaddress").val(address);
+            //submit
+            document.getElementById("submitEditButton").type = "submit";
+            $("#editModal").modal();
+        }
+        /// cancel
+        function cancelOrder(id) {
+            $("#cancelid").val(id);
+            $("#cancelModal").modal();
+        }
+        /// import
+        function importOrder(id) {
+            $("#importid").val(id);
+            $("#importModal").modal();
+        }
+        /// reject
+        function rejectOrder(id) {
+            $("#rejectid").val(id);
+            $("#rejectModal").modal();
+        }
+        /// return
+        function returnOrder(id) {
+            $("#returnid").val(id);
+            $("#returnModal").modal();
+        }
+        /// reSetup
+        function reSetupOrder(id) {
+            $("#resetupid").val(id);
+            $("#resetupModal").modal();
+        }
+        /// delete
+        function deleteOrder(id) {
+            $("#deleteid").val(id);
+            $("#deleteModal").modal();
+        }
+        ////////////////////////////
+        $(document).ready(function () {
+            $("#option1, #option2, #option3").click(function () {
+                $("#myCollapse").hide();
+            });
+
+            $("#option4").click(function () {
+                $("#myCollapse").show();
+            });
+
+            ///////
+            jQuery("#txtCatID").change(function () {
+                var Id = jQuery(this).children(":selected").attr("value");
+                Id = parseFloat(Id);
+                $('#txtCatID option')
+                    .removeAttr('selected');
+                $("#txtCatID > [value=" + Id + "]").attr("selected", "true");
+                $.ajax({
+                    url: '/Book/Filtter',
+                    datatype: "json",
+                    type: "GET",
+                    data: {
+                        CatID: Id
+                    },
+                    async: true,
+                    success: function (results) {
+                        if (results.status == "success") {
+                            window.location.href = results.redirectUrl;
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('error');
+                    }
+                });
+            });
+            jQuery("#txtIDXB").change(function () {
+                var Id = jQuery(this).children(":selected").attr("value");
+                Id = parseFloat(Id);
+                $('#txtIDXB option')
+                    .removeAttr('selected');
+                $("#txtIDXB > [value=" + Id + "]").attr("selected", "true");
+                $.ajax({
+                    url: '/Book/Filtter',
+                    datatype: "json",
+                    type: "GET",
+                    data: {
+                        CatID: Id
+                    },
+                    async: true,
+                    success: function (results) {
+                        if (results.status == "success") {
+                            window.location.href = results.redirectUrl;
+                        }
+                    },
+                    error: function (xhr) {
+                        alert('error');
+                    }
+                });
+            });
+            $("#keyword").keyup(function () {
+                var strkeyword = $('#keyword').val();
+                $.ajax({
+                    url: '/Search/FindBanHang/',
+                    datatype: "json",
+                    type: "POST",
+                    data: { keyword: strkeyword },
+                    async: true,
+                    success: function (results) {
+                        $("#records_table").html("");
+                        $("#records_table").html(results);
+                    },
+                    error: function (xhr) {
+                        alert('error');
+                    }
+                });
+            });
+        });
+        document.getElementById('table_click').addEventListener('click', function (event) {
+            var target = event.target;
+            // Kiểm tra xem phần tử được click có phải là thẻ 'a' không
+            if (target.tagName.toLowerCase() === 'a' || target.tagName.toLowerCase() === 'button') {
+                // Ngăn chặn sự kiện click từ thẻ 'a' truyền lên đến thẻ 'tr'
+                event.stopPropagation();
+            } else if (target.tagName.toLowerCase() === 'td') {
+            }
+        });
+    </script>
+}

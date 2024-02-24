@@ -1,0 +1,136 @@
+﻿@model FashionShop.Models.Order
+        <div class="modal-content">
+            <div class="container bootstrap snippets bootdey" id="bill-print">
+                <div class="modal-header" style="justify-content:center !important">
+                    <h2 class="modal-title" id="exampleModalLabel">HÓA ĐƠN</h2>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-6 text-left">
+                                <h4><strong>Thông tin khách hàng</strong></h4>
+                                <ul class="list-unstyled">
+                                    <li><strong>Tên:</strong> @Model.Name</li>
+                                    <li><strong>Số điện thoại:</strong> @Model.Phone</li>
+                                    <li><strong>Ngày đặt:</strong> @(Model.CreatedAt?.ToString("dd/MM/yyyy hh:mm tt"))</li>
+                                    <li><strong>Địa chỉ:</strong> @Model.Address</li>
+                                </ul>
+                            </div>
+
+                            <div class="col-md-6 col-sm-6 text-right">
+                                <h4><strong>Thông tin thanh toán</strong></h4>
+                                <ul class="list-unstyled">
+                                    <li><strong>Mã đơn hàng:</strong> @Model.Code</li>
+                                    <li>
+                                        <strong>Hình thức:</strong>
+                                        @{
+                                            if (Model.PayWay == FashionShop.Shared.PayConst.OFFLINE)
+                                            {
+                                                @Html.Raw(" Thanh toán khi nhận hàng")
+                                            }
+                                            else if (Model.PayWay == FashionShop.Shared.PayConst.ONLINE)
+                                            {
+                                                @Html.Raw(" Thanh toán MoMo")
+                                            }
+                                        }
+                                    </li>
+                                    <li>
+                                        <strong>Trạng thái:</strong>
+                                        @{
+                                            if (Model.PayStatus == FashionShop.Shared.PayStatusConst.NODONE)
+                                            {
+                                                <span class="badge badge-danger d-inline"> Chưa thanh toán</span>
+                                            }
+                                            else if (Model.PayStatus == FashionShop.Shared.PayStatusConst.DONE)
+                                            {
+                                                <span class="badge badge-success d-inline"> Đã thanh toán</span>
+                                            }
+                                        }
+                                    </li>
+                                </ul>
+
+                            </div>
+
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-condensed nomargin">
+                                <thead>
+                                    <tr>
+                                        <th>Tên sản phẩm</th>
+                                        <th class="text-center">Màu</th>
+                                        <th class="text-center">Size</th>
+                                        <th class="text-center">Số lượng</th>
+                                        <th>Đơn giá</th>
+                                        <th>Giảm giá</th>
+                                        <th>Thành tiền</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var detail in Model.OrderDetails)
+                                    {
+                                        <tr>
+                                            <td>
+                                                <div><strong>@detail.Product.Name</strong></div>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="badge text-dark" style="background-color:@(detail.Product?.Color?.Code)">@(detail.Product?.Color?.Name)</span>
+                                            </td>
+                                            <td class="text-center">@(detail.Product?.Size?.Code)</td>
+                                            <td class="text-center">@detail.Quantity</td>
+                                            <td>@(detail.Product?.Price?.ToString("n0"))</td>
+                                            <td>@((detail.Product?.Discount * detail.Quantity)?.ToString("n0"))</td>
+                                            <td>@(detail.Total?.ToString("n0"))</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <hr class="nomargin-top">
+                        <div class="row">
+                            <div class="col-sm-6 text-left">
+                                <h4><strong>Thông tin thêm</strong></h4>
+                                <p class="nomargin nopadding">
+                                    <strong>Ghi chú:</strong>
+                                    Được kiểm tra hàng.
+                            </div>
+                            <div class="col-sm-6 text-right">
+                                <table class="w-80 float-right">
+                                    <tr>
+                                        <td class="float-left font-weight-bold">Tổng thành tiền:</td>
+                                        <td> @((Model.Total - Model.ShipFee + Model.Discount)?.ToString("n0")) VND</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="float-left font-weight-bold">Giảm giá(hóa đơn):</td>
+                                        <td> @(Model.Discount?.ToString("n0")) VND</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="float-left font-weight-bold">Phí giao hàng:</td>
+                                        <td> @(Model.ShipFee?.ToString("n0")) VND</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="float-left font-weight-bold">Tiền phải trả:</td>
+                                        <td> @(Model.Total?.ToString("n0")) VND</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default text-right my-3">
+                <div class="panel-body">
+                    <div class="dropdown dropdown-animated scale-right">
+                        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa-solid fa-download mr-1"></i>Lưu hóa đơn
+                        </button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item btn btn-light" href="@Url.Action("ExportBill",new{id=Model.Id, option = "excel"})" target="_blank"><i class="fa-solid fa-file-excel mr-1"></i>Excel</a>
+                            <a class="dropdown-item btn btn-light" href="@Url.Action("ExportBill",new{id=Model.Id, option = "pdf"})" target="_blank"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</a>
+                        </div>
+                    </div>
+                    <button class="btn btn-danger" onclick="printBill()"><i class="fa-solid fa-print mr-1"></i>In hóa đơn</button>
+                </div>
+            </div>
+        </div>
